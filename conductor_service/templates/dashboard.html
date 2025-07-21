@@ -1,0 +1,52 @@
+{% block title %}Conductor Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4 text-center">🚌 Conductor Dashboard</h2>
+
+  <div class="row text-center mb-4">
+    <div class="col-md-4">
+      <div class="card shadow-sm border-primary">
+        <div class="card-body">
+          <h5 class="card-title">Total Bookings Today</h5>
+          <p class="display-6 text-primary">{{ total_bookings }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm border-success">
+        <div class="card-body">
+          <h5 class="card-title">Cash Tickets</h5>
+          <p class="display-6 text-success">{{ cash_bookings }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm border-info">
+        <div class="card-body">
+          <h5 class="card-title">Online Tickets Scanned</h5>
+          <p class="display-6 text-info">{{ scanned_bookings }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-5">
+    <div class="col-md-4 text-center mb-3">
+      <a href="{% url 'manual_booking' %}" class="btn btn-lg btn-outline-primary w-100">
+        ➕ Manual Booking
+      </a>
+    </div>
+    <div class="col-md-4 text-center mb-3">
+      <a href="{% url 'scan_qr' %}" class="btn btn-lg btn-outline-success w-100">
+  📷 Scan QR Ticket
+</a>
+    </div>
+    <div class="col-md-4 text-center mb-3">
+      <a href="{% url 'todays_bookings' %}" class="btn btn-lg btn-outline-dark w-100">
+        📋 View Today's Bookings
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

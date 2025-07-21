@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Submit Complaint</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #eef1f4;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #0077cc;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 18px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+    .form-row {
+      margin-bottom: 20px;
+    }
+    .image-preview {
+      display: none;
+      margin-top: 10px;
+    }
+    .image-preview img {
+      width: 100%;
+      max-height: 150px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    button {
+      background-color: #28a745;
+      color: white;
+      font-weight: bold;
+      padding: 12px 30px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>📢 Submit a Complaint</h2>
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="form-row">
+      <label for="id_passenger_name">Your Name</label>
+      {{ form.passenger_name }}
+    </div>
+
+    <div class="form-row">
+      <label for="id_contact_number">Contact Number</label>
+      {{ form.contact_number }}
+    </div>
+
+    <div class="form-row">
+      <label for="id_address">Address</label>
+      {{ form.address }}
+    </div>
+
+    <div class="form-row">
+      <label for="id_bus">Bus</label>
+      {{ form.bus }}
+    </div>
+
+    <div class="form-row">
+      <label for="id_route">Route</label>
+      {{ form.route }}
+    </div>
+
+    <div class="form-row">
+      <label for="id_description">Complaint Description</label>
+      {{ form.description }}
+    </div>
+
+    <div class="form-row">
+      <label>Upload Images (Optional)</label>
+      {{ formset.management_form }}
+      {% for form in formset %}
+      <div>
+        {{ form.image }}
+        <div class="image-preview">
+          <img class="preview-img" src="#" alt="Preview">
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div style="text-align: center;">
+      <button type="submit">✅ Submit Complaint</button>
+    </div>
+
+    {% if form.errors or formset.errors %}
+    <div style="margin-top: 20px; color: red;">
+      <ul>
+        {% for field in form %}
+          {% for error in field.errors %}
+            <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+          {% endfor %}
+        {% endfor %}
+        {% for error in form.non_field_errors %}
+          <li>{{ error }}</li>
+        {% endfor %}
+        {% for form in formset %}
+          {% for field in form %}
+            {% for error in field.errors %}
+              <li>Image: {{ error }}</li>
+            {% endfor %}
+          {% endfor %}
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  </form>
+</div>
+
+<script>
+  document.querySelectorAll('input[type="file"]').forEach(input => {
+    input.addEventListener('change', function () {
+      const previewDiv = this.nextElementSibling;
+      const img = previewDiv.querySelector('img');
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          img.src = e.target.result;
+          previewDiv.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      } else {
+        previewDiv.style.display = 'none';
+        img.src = '#';
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

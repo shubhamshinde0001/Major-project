@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NMMT</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap 5 CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+  <!-- jQuery (required by Select2) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+  
+  <style>
+    body {
+      margin: 0;
+      background-color: #f8f9fa;
+      padding-top: 120px;
+    }
+
+    .custom-header {
+      border-radius: 20px;
+        margin: 20px auto;
+        max-width: 1500px;
+    }
+
+    .navbar-brand span {
+        font-weight: 700;
+        font-size: 1.25rem;
+        color: #333;
+        letter-spacing: 0.5px;
+    }
+
+    .navbar-nav .nav-link {
+        padding-top: 8px;
+        padding-bottom: 8px;
+    }
+
+    .nav-link:hover {
+        color: #007bff; /* Bootstrap primary color */
+        font-weight: 500;
+    }
+
+    .feature-slider {
+  height: 300px;
+  background-color: #f7f7f7; /* Bootstrap Blue */
+  font-size: 1rem;
+  transition: all 0.5s ease-in-out;
+  border-radius: 20px;
+}
+
+.feature-slider-container {
+  max-width: 95%;
+  margin: 30px auto 0 auto; /* 40px space from header, center horizontally */
+}
+
+
+#featureImage {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  border-radius: 20px;
+
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+#featureImage.fade-out {
+  opacity: 0;
+  transform: scale(1.05);
+}
+
+
+#busMap {
+  background-color: #f5f7fa;
+  border-radius: 10px;
+}
+
+
+.slider-wrapper {
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+  border-radius: 20px;
+  position: relative;
+}
+
+.slider-track {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+  height: 100%;
+}
+
+.slider-track img {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  flex-shrink: 0;
+}
+
+.fancy-hover:hover {
+  background: linear-gradient(90deg, #a7256c 0%, #0700b8 100%);
+  color: white; /* optional for contrast */
+  border: none;
+}
+
+
+  </style>
+</head>
+<body>
+
+<!-- Header with rounded corners -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm px-4 custom-header fixed-top">
+  <div class="container-fluid">
+    <!-- Logo + Company Name -->
+    <a class="navbar-brand d-flex align-items-center" href="#">
+      <img src="/static/images/logo.png" alt="Logo" width="110" height="50" class="me-2">
+      <span>NAVI MUMBAI MUNICIPAL TRANSPORT</span>
+    </a>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Nav Items -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav mx-auto">
+        <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Services</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Projects</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Team</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
+      </ul>
+
+      <!-- Login Button -->
+      <div class="d-flex">
+        <a href="#" class="btn btn-primary fancy-hover">Login</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- User Sidebar -->
+<div id="userSidebar" class="position-fixed top-0 start-0 vh-100 bg-white shadow-lg p-4"
+     style="width: 250px; transform: translateX(-100%); transition: transform 0.3s ease; z-index: 1050;">
+  
+  <!-- Close Button -->
+  <button id="closeSidebar" class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-3">
+  ←
+</button>
+
+  <h5 class="fw-bold mb-4">👤 User Menu</h5>
+  <ul class="list-unstyled">
+    <li class="mb-3"><a href="#" class="text-dark text-decoration-none">Profile</a></li>
+    <li class="mb-3"><a href="{% url 'my_bookings' %}" class="text-dark text-decoration-none">My Bookings</a></li>
+    <li class="mb-3"><a href="#" class="text-dark text-decoration-none">Notifications</a></li>
+    <li class="mb-3"><a href="#" class="text-dark text-decoration-none">Help</a></li>
+    <li><a href="#" class="text-dark text-decoration-none">Logout</a></li>
+  </ul>
+</div>
+
+<!-- User Icon Button (fixed at top-left beside main container) -->
+<button id="toggleUserSidebar" class="btn btn-outline-dark rounded-circle shadow-sm"
+        style="position: fixed; top: 30px; left: 70px; width: 58px; height: 58px; z-index: 1100;">
+  <i class="fas fa-user"></i>
+</button>
+<div class="slider-wrapper" style="max-width: 95%; margin: 0 auto;">
+  <div class="slider-track" id="sliderTrack"></div>
+</div>
+ 
+
+<div class="container-fluid mt-4" id="recentBookingsSection" style="padding-top: 0.3%; padding-bottom: 1%; background-color: #e6ebee; max-width: 95%; margin: 0 auto;">
+  <h3 class="mb-6 " style="font-size: 20px; text-align: center">Your Recent Bookings</h3>
+  <div id="recentBookingsContainer" style="display: flex; gap: 30px;"></div>
+</div>
+
+
+
+<!-- Book Your Ticket Section -->
+<div class="container-fluid mt-4" style="width: 95%;">
+  <div class="p-4 rounded text-center" style="background-color: #e6ebee;">
+    <h3 class="mb-6 fw-bold" style="padding-bottom: 0.7%;">Book Your Ticket</h3>
+
+    <div class="p-5 bg-white rounded shadow-sm" style="max-width: 1000px; margin: 0 auto;">
+      <form id="ticketForm">
+        <div class="row g-4">
+          <div class="col-lg-4 d-flex flex-column align-items-start">
+            <label for="bus_type" class="form-label fw-semibold fs-5">Route-No:</label>
+            <select class="form-select form-select-lg w-100" id="route">
+              <option selected disabled>Select Route</option>
+            </select>
+          </div>
+
+
+          <div class="col-lg-4 d-flex flex-column align-items-start">
+            <label for="from" class="form-label fw-semibold fs-5">From:</label>
+            <select class="form-select form-select-lg w-100" id="from" name="from">
+              <option selected disabled>Select Starting Point</option>
+            </select>
+          </div>
+
+          <div class="col-lg-4 d-flex flex-column align-items-start">
+            <label for="to" class="form-label fw-semibold fs-5">To:</label>
+            <select class="form-select form-select-lg w-100" id="to" name="to">
+              <option selected disabled>Select Destination</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg fw-bold w-30 mt-5">Search Buses</button>
+      </form>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const routeSelect = document.getElementById("route");
+  const fromSelect = $('#from');
+  const toSelect = $('#to');
+
+  // Enable Select2
+  $('#route').select2({ width: '100%' });
+  fromSelect.select2({ width: '100%' });
+  toSelect.select2({ width: '100%' });
+
+  // Load all routes
+  fetch("/api/routes/")
+    .then(res => res.json())
+    .then(routes => {
+      console.log("✅ Routes:", routes);
+      routes.forEach(route => {
+        const opt = document.createElement("option");
+        opt.value = route.route_no;
+        opt.textContent = `${route.route_no}: ${route.source} → ${route.destination}`;
+        routeSelect.appendChild(opt);
+      });
+    });
+
+  // Load all bus stops on page load
+  fetch("/api/stops/")
+    .then(res => res.json())
+    .then(stops => {
+      console.log("✅ All Stops:", stops);
+      populateStops(stops);
+    });
+
+  // Populate From and To dropdowns
+  function populateStops(stops) {
+    fromSelect.empty().append('<option disabled selected value="">Select Starting Point</option>');
+    toSelect.empty().append('<option disabled selected value="">Select Destination</option>');
+
+    stops.forEach(stop => {
+      fromSelect.append(new Option(stop.name, stop.name)); // name as both text and value
+      toSelect.append(new Option(stop.name, stop.name));
+    });
+
+    fromSelect.trigger('change.select2');
+    toSelect.trigger('change.select2');
+  }
+
+
+  // NOTE: No route-based filtering anymore
+  // Route dropdown is just for display or future use
+});
+</script>
+
+
+
+
+    </div>
+    <div id="busResultsContainer" style="display: none; width: 75%; margin: 0 auto;">
+  <h4 class="fw-bold mb-3 mt-3 text-start">Available Buses</h4>
+  <div id="busResults" style="max-height: 300px; overflow-y: auto; "></div>
+  </div>
+</div>
+</div>
+
+
+<!-- Buses Near You Section -->
+<div class="container-fluid mt-5" style="width: 95%;">
+  <div class="p-4 rounded text-center shadow-sm" style="background-color: #e7ebee;">
+    <h3 class="mb-4 fw-bold">Buses Near You</h3>
+
+    <!-- Map Box -->
+    <div id="busMap" class="rounded shadow-sm" style="height: 400px; width: 100%; background-color: #e9ecef;">
+      <p class="pt-5 text-muted">Map will appear here showing nearby buses...</p>
+    </div>
+  </div>
+</div>
+
+
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const map = L.map("busMap");
+
+// Try to get user's current location
+map.locate({ setView: true, maxZoom: 16 });
+
+// Add tile layer (OpenStreetMap)
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+
+// If location found
+map.on("locationfound", function (e) {
+  const radius = e.accuracy / 2;
+
+  L.marker(e.latlng).addTo(map)
+    .bindPopup("📍 You are here").openPopup();
+
+  L.circle(e.latlng, radius).addTo(map);
+});
+
+// If location not found or denied
+map.on("locationerror", function () {
+  alert("⚠️ Location access denied. Default location will be used.");
+  map.setView([19.0330, 73.0297], 13);  // Fallback to Navi Mumbai
+});
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    const busIcon = L.icon({
+      iconUrl: "/static/images/bus-icon.png",  // Make sure this path is correct
+      iconSize: [32, 32],
+      iconAnchor: [16, 32],
+      popupAnchor: [0, -30]
+    });
+
+    let markers = [];
+
+    function loadAllBusLocations() {
+      fetch("/api/bus_locations/")
+        .then(res => res.json())
+        .then(data => {
+          // Clear old markers
+          markers.forEach(m => map.removeLayer(m));
+          markers = [];
+
+          data.forEach(bus => {
+            const marker = L.marker([bus.lat, bus.lng], { icon: busIcon })
+              .bindPopup(`</strong> ${bus.id}`)
+              .addTo(map);
+            markers.push(marker);
+          });
+        })
+        .catch(err => console.error("Map Error:", err));
+    }
+
+    loadAllBusLocations();
+    setInterval(loadAllBusLocations, 5000);
+  });
+</script>
+
+
+
+
+
+
+
+
+<!-- Two Side-by-Side Boxes Section -->
+<div class="container mt-5" style="width: 85%;">
+  <div class="row g-4">
+    
+    <!-- Left Box -->
+    <div class="col-md-6">
+      <div class="p-4 rounded shadow-sm h-100 text-center" style="background-color: rgba(241, 125, 117, 0.2);">
+        <h4 class="fw-bold mb-3">COMPLAINT</h4>
+        <p>Faced an issue during your journey? Submit your complaint and we’ll take care of it promptly.</p>
+        <a href="{% url 'report_complaint' %}" class="btn btn-danger fw-bold mt-4 px-3 py-2">
+  REGISTER COMPLAINT
+</a>
+
+      </div>
+    </div>
+    
+    <!-- Right Box -->
+    <div class="col-md-6">
+      <div class="p-4 rounded shadow-sm h-100 text-center" style="background-color: rgba(108, 224, 215, 0.2);">
+        <h4 class="fw-bold mb-3">LOST & FOUND</h4>
+        <p> Lost something while traveling? Report your lost items here in our Lost & Found section.</p>
+        <a href="{% url 'report_lost_item' %}" class="btn btn-success fw-bold mt-4 px-3 py-2">REPORT ITEMS</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+<!-- Footer Section -->
+<footer style="background-color: #061b27;" class="text-white pt-5 pb-4 mt-5">
+  <div class="container text-md-left">
+    <div class="row">
+
+      <!-- Column 1: NMMT BUS SERVICE + Social Icons -->
+      <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mb-4">
+        <h5 class="text-uppercase fw-bold mb-4">NMMT BUS SERVICE</h5>
+        <div class="d-flex gap-3">
+          <a href="#" class="text-white"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="text-white"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="text-white"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="text-white"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+
+      <!-- Column 2: Quick Links -->
+      <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mb-4">
+        <h5 class="text-uppercase fw-bold mb-4">Quick Links</h5>
+        <p><a href="#" class="text-white text-decoration-none">Home</a></p>
+        <p><a href="#" class="text-white text-decoration-none">Book Ticket</a></p>
+        <p><a href="#" class="text-white text-decoration-none">Track Bus</a></p>
+        <p><a href="#" class="text-white text-decoration-none">Contact</a></p>
+      </div>
+
+      <!-- Column 3: Contact Us -->
+      <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mb-4">
+        <h5 class="text-uppercase fw-bold mb-4">Contact Us</h5>
+        <p><i class="fas fa-home me-2"></i> Navi Mumbai, MH 400705</p>
+        <p><i class="fas fa-envelope me-2"></i> support@nmmt.in</p>
+        <p><i class="fas fa-phone me-2"></i> +91 98765 43210</p>
+      </div>
+
+      <!-- Column 4: Newsletter -->
+      <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mb-md-0 mb-4">
+        <h5 class="text-uppercase fw-bold mb-4">Newsletter</h5>
+        <p>Stay updated with latest route updates, offers & more.</p>
+        <div class="input-group">
+          <input type="email" class="form-control" placeholder="Your email" />
+          <button class="btn btn-success" type="button"><i class="fas fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</footer>
+
+
+
+
+
+
+
+<!-- Bootstrap JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- ✅ Unified Custom JavaScript -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+  const images = [
+    "static/images/img1.png",
+    "static/images/img2.png",
+    "static/images/img3.png",
+    "static/images/img4.png",
+    "static/images/img5.png"
+  ];
+
+  const sliderTrack = document.getElementById("sliderTrack");
+
+    // Add all images dynamically
+    images.forEach(src => {
+      const img = document.createElement("img");
+      img.src = src;
+      sliderTrack.appendChild(img);
+    });
+
+    let currentIndex = 0;
+    const totalSlides = images.length;
+
+    // Auto-slide every 4 seconds
+    setInterval(() => {
+      currentIndex = (currentIndex + 1) % totalSlides;
+      sliderTrack.style.transform = `translateX(-${currentIndex * 100}%)`;
+    }, 4000);
+  });
+
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const sidebar = document.getElementById("userSidebar");
+    const toggleBtn = document.getElementById("toggleUserSidebar");
+    const closeBtn = document.getElementById("closeSidebar");
+
+    if (toggleBtn && sidebar && closeBtn) {
+      toggleBtn.addEventListener("click", function () {
+        sidebar.style.transform = "translateX(0%)"; // Open sidebar
+      });
+
+      closeBtn.addEventListener("click", function () {
+        sidebar.style.transform = "translateX(-100%)"; // Close sidebar
+      });
+    }
+  });
+
+
+
+
+
+
+
+    // ✅ Ticket Form Handler
+    
+document.addEventListener("DOMContentLoaded", function () {
+  const form = document.getElementById("ticketForm");
+  const fromSelect = document.getElementById("from");
+  const toSelect = document.getElementById("to");
+  const container = document.getElementById("busResults");
+  const outer = document.getElementById("busResultsContainer");
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const from = $('#from').val();
+    const to = $('#to').val();
+
+    if (!from || !to) {
+      alert("Please select both 'From' and 'To' stops.");
+      return;
+    }
+
+    console.log("📦 Requesting buses from:", from, "to:", to);
+
+    // Fetch from Django backend
+    fetch(`/api/available-buses/?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`)
+      .then(response => response.json())
+      .then(results => {
+        console.log("✅ Results from backend:", results);
+        container.innerHTML = ""; // Clear previous
+
+        if (results.length === 0) {
+          container.innerHTML = `<div class="alert alert-warning">No buses available from ${from} to ${to}.</div>`;
+        } else {
+          results.forEach(bus => {
+            container.innerHTML += `
+              <div class="card mb-3 shadow-sm">
+                <div class="card-body">
+                  <h5 class="card-title">${bus.from} ➝ ${bus.to}</h5>
+                  <p class="card-text">Bus Type: ${bus.type} | Departure: ${bus.time}</p>
+                  <button class="btn btn-success btn-sm"
+                  onclick="window.location.href = '/book-ticket/?route_no=${encodeURIComponent(bus.route_no)}&from=${encodeURIComponent(bus.from)}&to=${encodeURIComponent(bus.to)}'">
+                  Book Now
+                  </button>
+                </div>
+              </div>`;
+          });
+        }
+
+        outer.style.display = "block";
+      })
+      .catch(err => {
+        console.error("❌ Error fetching bus data:", err);
+        container.innerHTML = `<div class="alert alert-danger">Error fetching bus data.</div>`;
+        outer.style.display = "block";
+      });
+  });
+});
+
+
+//3 recent booking window
+
+window.addEventListener("DOMContentLoaded", () => {
+  fetch("/api/recent-bookings/")
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById("recentBookingsContainer");
+      if (data.recent_bookings.length === 0) {
+        container.innerHTML = "<p>No recent bookings found.</p>";
+        return;
+      }
+
+      container.style.display = "flex";
+      container.style.flexWrap = "wrap";
+      container.style.gap = "15px";
+
+      data.recent_bookings.forEach(booking => {
+        const box = document.createElement("div");
+        box.style.cssText = `
+          display: flex;
+          align-items: stretch;
+          border: 1px solid #ccc;
+          padding: 0;
+          border-radius: 28px;
+          cursor: pointer;
+          flex: 1;
+          min-width: 280px;
+          background-color: #fafafa;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        `;
+
+        box.innerHTML = `
+          <div style="
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #FFA500;
+            border-radius: 28px;
+            color: #4B0082;
+            font-weight: bold;
+            font-size: 54px;
+            padding: 0 20px;
+            min-width: 100px;
+          ">
+            ${booking.route_no}
+          </div>
+          <div style="line-height: 1.2; font-size: 14px; padding: 15px;">
+            <p><strong>From:</strong> ${booking.from_stop}</p>
+            <p><strong>To:</strong> ${booking.to_stop}</p>
+          </div>
+        `;
+
+        box.onclick = () => prefillBooking(booking.route_no, booking.from_stop, booking.to_stop);
+        container.appendChild(box);
+      });
+    })
+    .catch(err => {
+      console.error("Error loading recent bookings:", err);
+      document.getElementById("recentBookingsContainer").innerHTML = `<p style="color:red;">Error loading bookings.</p>`;
+    });
+});
+
+  function prefillBooking(routeNo, from, to) {
+  const fromSelect = document.getElementById("from");
+  const toSelect = document.getElementById("to");
+
+  // Set values (assumes 'from' and 'to' are actual option values)
+ setTimeout(() => {
+    const fromOptionExists = [...fromSelect.options].some(opt => opt.value === from);
+    const toOptionExists = [...toSelect.options].some(opt => opt.value === to);
+
+    if (fromOptionExists) fromSelect.value = from;
+    if (toOptionExists) toSelect.value = to;
+
+  // Dispatch submit programmatically
+  document.getElementById("ticketForm").dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+}, 200);
+}
+
+
+
+
+</script>
+
+
+
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Scan Ticket (QR)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      text-align: center;
+      padding: 30px;
+    }
+    h2 {
+      color: #333;
+    }
+    #scanner {
+      width: 320px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 16px;
+      color: green;
+    }
+    #result.error {
+      color: red;
+    }
+  </style>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+</head>
+<body>
+
+  <h2>Scan Passenger QR Ticket</h2>
+
+  <div id="scanner"></div>
+  <div id="result">Waiting for scan...</div>
+
+  <script>
+    function handleScanSuccess(decodedText, decodedResult) {
+      document.getElementById("result").innerText = "🔍 Verifying ticket...";
+
+      fetch(`/conductor/verify-ticket/?data=${encodeURIComponent(decodedText)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.valid) {
+            document.getElementById("result").innerHTML = `
+              ✅ <strong>Valid Ticket</strong><br>
+              <strong>Booking ID:</strong> ${data.booking_id}<br>
+              <strong>Route:</strong> ${data.route}<br>
+              <strong>From:</strong> ${data.source}<br>
+              <strong>To:</strong> ${data.destination}<br>
+              <strong>Seats:</strong> ${data.seats}<br>
+              <strong>Fare:</strong> ₹${data.fare}<br>
+              <em>${data.message}</em>
+            `;
+          } else {
+            document.getElementById("result").innerHTML = `❌ <span class="error">>${data.message || "Invalid ticket"}</span>`;
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          document.getElementById("result").innerHTML = `❌ <span class="error">Error verifying ticket</span>`;
+        });
+    }
+
+    function handleScanFailure(error) {
+      // console.warn("Scan failed: ", error);
+    }
+
+    const scanner = new Html5QrcodeScanner("scanner", {
+      fps: 10,
+      qrbox: 250
+    });
+
+    scanner.render(handleScanSuccess, handleScanFailure);
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h2>Lost Item Reported</h2>
+    <p><strong>Item ID:</strong> {{ lost_item.id }}</p>
+    <p><strong>Description:</strong> {{ lost_item.description }}</p>
+    {% if lost_item.image %}
+        <p><strong>Image:</strong><br><img src="{{ lost_item.image.url }}" alt="Lost Item" style="max-width: 200px;"></p>
+    {% else %}
+        <p><strong>Image:</strong> No image uploaded</p>
+    {% endif %}
+    <p><strong>Bus:</strong> {{ lost_item.bus.bus_id|default:"Not specified" }}</p>
+    <p><strong>Route:</strong> {{ lost_item.route.route_no|default:"Not specified" }} ({{ lost_item.route.source|default:"" }} to {{ lost_item.route.destination|default:"" }})</p>
+    <p><strong>Date and Time of Loss:</strong> {{ lost_item.loss_datetime|default:"Not specified" }}</p>
+    <p><strong>Passenger Name:</strong> {{ lost_item.passenger_name }}</p>
+    <p><strong>Contact Number:</strong> {{ lost_item.contact_number }}</p>
+    <p><strong>Status:</strong> {{ lost_item.status }}</p>
+    <p><strong>Reported At:</strong> {{ lost_item.reported_at }}</p>
+    <a href="{% url 'report_lost_item' %}" class="btn btn-primary">Report Another Item</a>
+    <a href="{% url 'home' %}" class="btn btn-secondary">Back to Home</a>
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+<form method="post">
+  {% csrf_token %}
+
+  <label for="route_no">Select Route:</label>
+  <select name="route_no" id="route_no" required>
+    <option value="">-- Choose Route --</option>
+    {% for route in routes %}
+      <option value="{{ route.route_no }}">
+        {{ route.route_no }} - {{ route.source }} to {{ route.destination }}
+      </option>
+    {% endfor %}
+  </select>
+
+  <label for="from_stop">From Stop:</label>
+  <select name="from_stop" required>
+    <option value="">-- Choose From Stop --</option>
+    {% for stop in bus_stops %}
+      <option value="{{ stop.name }}">{{ stop.name }}</option>
+    {% endfor %}
+  </select>
+
+  <label for="to_stop">To Stop:</label>
+  <select name="to_stop" required>
+    <option value="">-- Choose To Stop --</option>
+    {% for stop in bus_stops %}
+      <option value="{{ stop.name }}">{{ stop.name }}</option>
+    {% endfor %}
+  </select>
+
+  <label for="seats">Number of Seats:</label>
+  <input type="number" name="seats" min="1" value="1" required>
+
+  <button type="submit">Book Ticket</button>
+</form>

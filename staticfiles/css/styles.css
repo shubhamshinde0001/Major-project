@@ -1,0 +1,18 @@
+/* static/css/styles.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+.btn-primary {
+    @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200;
+}
+.form-control {
+    @apply border-gray-300 rounded-lg p-2 w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+}
+.card {
+    @apply bg-white shadow-md rounded-lg p-6;
+}
+.navbar {
+    @apply bg-blue-800 text-white p-4;
+}

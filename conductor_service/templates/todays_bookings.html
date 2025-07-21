@@ -1,0 +1,51 @@
+
+{% block content %}
+<div class="container mt-5">
+  <h3 class="mb-4">📅 Bookings for {{ today }}</h3>
+
+  {% if bookings %}
+    <div class="table-responsive">
+      <table class="table table-striped table-bordered">
+        <thead class="table-dark">
+          <tr>
+            <th>#</th>
+            <th>Booking ID</th>
+            <th>Route</th>
+            <th>Source</th>
+            <th>Destination</th>
+            <th>Seats</th>
+            <th>Fare</th>
+            <th>Type</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for booking in bookings %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ booking.id }}</td>
+            <td>{{ booking.route }}</td>
+            <td>{{ booking.source }}</td>
+            <td>{{ booking.destination }}</td>
+            <td>{{ booking.seats }}</td>
+            <td>₹{{ booking.fare }}</td>
+            <td>
+  {% if booking.created_by_conductor %}
+    <span class="badge bg-success">Manual</span>
+  {% elif booking.created_online %}
+    <span class="badge bg-primary">Online</span>
+  {% else %}
+    <span class="badge bg-secondary">Unknown</span>
+  {% endif %}
+</td>
+            <td>{{ booking.booking_time|date:"H:i:s" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="alert alert-info">No bookings found for today.</div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ticket Booked</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      padding: 40px;
+    }
+    .success-box {
+      max-width: 500px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 10px;
+      padding: 30px;
+      text-align: center;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .success-box h2 {
+      color: #28a745;
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+    .success-box p {
+      font-size: 16px;
+      margin: 10px 0;
+      color: #333;
+    }
+    .success-box .label {
+      font-weight: bold;
+    }
+    .back-btn {
+      display: inline-block;
+      margin-top: 25px;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+    .back-btn:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="success-box">
+    <h2>Ticket Booked Successfully 🎫</h2>
+
+    <p><span class="label">Booking ID:</span> {{ booking.id }}</p>
+    <p><span class="label">Route:</span> {{ booking.route }}</p>
+    <p><span class="label">From:</span> {{ booking.source }}</p>
+    <p><span class="label">To:</span> {{ booking.destination }}</p>
+    <p><span class="label">Seats:</span> {{ booking.seats }}</p>
+    <p><span class="label">Fare:</span> ₹{{ booking.fare }}</p>
+
+    {% if booking.qr_code %}
+      <p><img src="{{ booking.qr_code.url }}" alt="QR Code" width="180" /></p>
+    {% endif %}
+
+    <a class="back-btn" href="{% url 'manual_booking' %}">Book Another Ticket</a>
+  </div>
+
+</body>
+</html>

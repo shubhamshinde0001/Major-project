@@ -1,0 +1,53 @@
+
+{% block content %}
+<div class="container mt-5">
+  <h3 class="mb-4">📊 Booking Analysis - {{ today }}</h3>
+
+  <div class="row g-4">
+    <div class="col-md-3">
+      <div class="card text-white bg-primary shadow">
+        <div class="card-body">
+          <h5>Total Bookings</h5>
+          <h2>{{ total_bookings }}</h2>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card text-white bg-success shadow">
+        <div class="card-body">
+          <h5>Total Passengers</h5>
+          <h2>{{ total_seats }}</h2>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card text-white bg-warning shadow">
+        <div class="card-body">
+          <h5>Total Revenue</h5>
+          <h2>₹{{ total_fare }}</h2>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card text-white bg-info shadow">
+        <div class="card-body">
+          <h5>Online Bookings</h5>
+          <h2>{{ online_count }}</h2>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3 mt-3">
+      <div class="card text-white bg-dark shadow">
+        <div class="card-body">
+          <h5>Manual Bookings</h5>
+          <h2>{{ manual_count }}</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

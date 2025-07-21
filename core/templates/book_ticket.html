@@ -1,0 +1,134 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Book Ticket</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+<div class="container py-5">
+  <h2 class="mb-4 fw-bold text-primary">Confirm Ticket Booking</h2>
+
+  <div class="card shadow-sm p-4">
+    <div class="mb-3">
+      <strong>Route No:</strong> {{ route_no }}
+    </div>
+    <div class="mb-3">
+      <strong>From:</strong> {{ from_stop }}
+    </div>
+    <div class="mb-3">
+      <strong>To:</strong> {{ to_stop }}
+    </div>
+
+    <div class="mb-3">
+      <label for="tickets" class="form-label">Number of Tickets:</label>
+      <div class="input-group" style="width: 150px;">
+        <button class="btn btn-outline-secondary" type="button" id="minus">−</button>
+        <input type="number" class="form-control text-center" id="tickets" value="1" min="1">
+        <button class="btn btn-outline-secondary" type="button" id="plus">+</button>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <strong>Total Fare: ₹<span id="totalFare">{{ base_fare }}</span></strong>
+    </div>
+
+    <button class="btn btn-success btn-lg" onclick="makePayment()">Make Payment</button>
+  </div>
+</div>
+
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const ticketInput = document.getElementById("tickets");
+    const minusBtn = document.getElementById("minus");
+    const plusBtn = document.getElementById("plus");
+    const fareDisplay = document.getElementById("totalFare");
+
+    const baseFare = {{ base_fare }};
+    
+    function updateFare() {
+      const qty = parseInt(ticketInput.value);
+      fareDisplay.innerText = qty * baseFare;
+    }
+
+    plusBtn.addEventListener("click", () => {
+      ticketInput.value = parseInt(ticketInput.value) + 1;
+      updateFare();
+    });
+
+    minusBtn.addEventListener("click", () => {
+      if (parseInt(ticketInput.value) > 1) {
+        ticketInput.value = parseInt(ticketInput.value) - 1;
+        updateFare();
+      }
+    });
+
+    ticketInput.addEventListener("input", updateFare);
+  });
+
+
+
+
+
+  function makePayment() {
+    const tickets = parseInt(document.getElementById("tickets").value);
+    const totalFare = tickets * {{ base_fare }};
+    const routeNo = "{{ route_no }}";
+    const fromStop = "{{ from_stop }}";
+    const toStop = "{{ to_stop }}";
+
+    fetch("/create-order/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token }}"
+      },
+      body: JSON.stringify({
+        amount: totalFare * 100,
+        tickets: tickets,
+        route_no: routeNo,
+        from: fromStop,
+        to: toStop
+      })
+    })
+    .then(res => res.json())
+    .then(order => {
+      const options = {
+        key: "{{ razorpay_key_id }}", // Pass from context or settings
+        amount: order.amount,
+        currency: "INR",
+        name: "NMMT Bus Ticket",
+        description: `Route ${routeNo} - ${fromStop} to ${toStop}`,
+        order_id: order.id,
+        handler: function (response) {
+          fetch("/payment-success/", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: JSON.stringify({
+              payment_id: response.razorpay_payment_id,
+              order_id: response.razorpay_order_id,
+              seats: tickets,
+              route_no: routeNo,
+              from: fromStop,
+              to: toStop
+            })
+          }).then(res => res.json())
+            .then(data => {
+              alert("✅ Booking confirmed!");
+              window.location.href = data.redirect_url; // redirect if needed
+            });
+        }
+      };
+      const rzp = new Razorpay(options);
+      rzp.open();
+    });
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,411 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NMMT Conductor Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Add in your <head> -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+</head>
+<body class="bg-gradient-to-br from-blue-100 to-indigo-200 min-h-screen p-4 font-sans">
+
+  <h1 class="text-3xl font-bold text-center mb-6 text-indigo-700 animate-pulse">Navi Mumbai Municipal Transport Bus Conductor Dashboard</h1>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-6">
+
+    <!-- Total Passengers -->
+    <div class="bg-white rounded-2xl p-4 shadow-lg">
+      <h2 class="text-xl font-semibold text-gray-700">Total Passengers</h2>
+      <p id="total-seats" class="text-3xl font-bold text-green-500 mt-2">{{ total_seats }}</p>
+    </div>
+
+    <!-- Total Revenue -->
+    <div class="bg-white rounded-2xl p-4 shadow-lg">
+      <h2 class="text-xl font-semibold text-gray-700">Total Revenue</h2>
+      <p id="total-fare" class="text-3xl font-bold text-green-500 mt-2">₹{{ total_fare }}</p>
+    </div>
+
+    <!-- Total Bookings -->
+    <div class="bg-white rounded-2xl p-4 shadow-lg">
+      <h2 class="text-xl font-semibold text-gray-700">Total Bookings</h2>
+      <p id="total-bookings" class="text-3xl font-bold text-blue-500 mt-2">{{ total_bookings }}</p>
+    </div>
+
+    <!-- Manual Bookings -->
+    <div class="bg-white rounded-2xl p-4 shadow-lg">
+      <h2 class="text-xl font-semibold text-gray-700">Manual Tickets</h2>
+      <p class="text-3xl font-bold text-yellow-500 mt-2" id="manual-count">{{ manual_count }}</p>
+    </div>
+
+    <!-- Online Bookings -->
+    <div class="bg-white rounded-2xl p-4 shadow-lg">
+      <h2 class="text-xl font-semibold text-gray-700">Online Tickets</h2>
+      <p id="online-count" class="text-3xl font-bold text-purple-500 mt-2">{{ online_count }}</p>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+
+
+
+
+
+
+    <!-- 🎫 Manual Booking Form -->
+<div class="bg-white p-6 rounded-2xl shadow-lg max-w-xl mx-auto">
+  <h2 class="text-xl font-semibold text-indigo-700 mb-4">🎫 Manual Ticket Booking</h2>
+
+<form id="manualBookingForm" method="post" action="{% url 'manual_booking' %}">
+  {% csrf_token %}
+
+  <!-- Route Dropdown -->
+  <label for="route" class="block text-sm font-medium mb-1">Route:</label>
+  <select id="route" name="route_no" required class="w-full p-2 border rounded">
+    <option value="" selected disabled>Select Route</option>
+  </select>
+
+  <!-- From Stop -->
+  <label for="from" class="block text-sm font-medium mb-1 mt-4">From Stop:</label>
+  <select id="from" name="from_stop" required class="w-full p-2 border rounded">
+    <option value="" selected disabled>Select From</option>
+  </select>
+
+  <!-- To Stop -->
+  <label for="to" class="block text-sm font-medium mb-1 mt-4">To Stop:</label>
+  <select id="to" name="to_stop" required class="w-full p-2 border rounded">
+    <option value="" selected disabled>Select To</option>
+  </select>
+
+  <!-- Seats -->
+  <div class="mb-4">
+  <label for="seats" class="block text-sm font-medium text-gray-700 mb-1">Number of Seats:</label>
+  <div class="flex items-center space-x-2 w-48">
+    <button type="button" id="minus" class="bg-gray-300 px-3 py-1 rounded text-lg font-bold">−</button>
+    <input type="number" name="seats" id="seats" class="w-16 text-center border border-gray-300 rounded" value="1" min="1" required readonly>
+    <button type="button" id="plus" class="bg-gray-300 px-3 py-1 rounded text-lg font-bold">+</button>
+  </div>
+</div>
+
+<!-- Fare Display -->
+<div class="mb-4 text-green-600 font-semibold text-right">
+  💰 Total Fare: ₹<span id="totalFare"></span>
+</div>
+
+  <!-- Submit -->
+  <button type="submit" class="mt-4 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 w-full">
+    Book Ticket
+  </button>
+</form>
+</div>
+
+
+
+
+
+
+
+
+
+    <!-- 📱 QR Scanner Simulation -->
+    <div class="bg-white p-6 rounded-2xl shadow-lg">
+      <h2 class="text-xl font-semibold text-indigo-700 mb-4">📱 QR Ticket Scanner</h2>
+      <div id="scanner" class="relative w-full h-48 bg-gray-100 flex items-center justify-center border border-dashed border-indigo-400 rounded-lg animate-pulse">
+        <p class="text-gray-600">[ QR Code Scanning Frame ]</p>
+      </div>
+      
+      <button class="mt-4 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded w-full">Simulate Scan</button>
+    <div id="result" style="color: black; text-align: center;">Waiting for scan...</div>
+    </div>
+    
+  </div>
+
+  <div class="bg-white p-6 rounded-2xl shadow-lg mb-6">
+  <h2 class="text-xl font-semibold text-indigo-700 mb-4">📊 Today's Bookings</h2>
+
+  <div class="overflow-x-auto">
+    <table class="min-w-full table-auto border text-sm text-left">
+      <thead>
+        <tr class="bg-indigo-100 text-indigo-700">
+          <th class="p-2">#</th>
+          <th class="p-2">Booking ID</th>
+          <th class="p-2">Route</th>
+          <th class="p-2">Source</th>
+          <th class="p-2">Destination</th>
+          <th class="p-2">Seats</th>
+          <th class="p-2">Fare</th>
+          <th class="p-2">Type</th>
+          <th class="p-2">Time</th>
+        </tr>
+      </thead>
+      <tbody id="bookings-table-body">
+        <!-- Dynamic content will be inserted by JavaScript -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Optional loading spinner or default message -->
+  <div id="no-bookings-msg" class="p-4 text-center text-gray-500 hidden">
+    No bookings found for today.
+  </div>
+</div>
+
+  <!-- Scripts -->
+
+  
+  
+
+
+
+    <!-- ✅ Route data passed from Django -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const routeSelect = document.getElementById("route");
+  const fromSelect = $('#from');
+  const toSelect = $('#to');
+  const seatsInput = document.getElementById("seats");
+  const minusBtn = document.getElementById("minus");
+  const plusBtn = document.getElementById("plus");
+  const fareDisplay = document.getElementById("totalFare");
+
+  let selectedFarePerSeat = 30;
+    const baseFare = 30;
+  // Enable Select2 if available
+  if (window.$ && $.fn.select2) {
+    $('#route').select2({ width: '100%' });
+    fromSelect.select2({ width: '100%' });
+    toSelect.select2({ width: '100%' });
+  }
+
+  // Load Routes
+  fetch("/api/routes/")
+    .then(res => res.json())
+    .then(routes => {
+      console.log("✅ Routes loaded:", routes);
+      routes.forEach(route => {
+        const opt = document.createElement("option");
+        opt.value = route.route_no;
+        opt.textContent = `${route.route_no}: ${route.source} → ${route.destination}`;
+        routeSelect.appendChild(opt);
+      });
+
+      // Update fare when route changes
+      routeSelect.addEventListener("change", () => {
+        const selected = routes.find(r => r.route_no === routeSelect.value);
+        if (selected) {
+    // Replace 30 with the base fare you set in Django
+    const baseFare = 30;
+    selectedFarePerSeat = selected.distance * baseFare;
+  } else {
+    selectedFarePerSeat = 0;
+  }
+        updateFare();
+      });
+    })
+    .catch(err => console.error("❌ Error loading routes:", err));
+
+  // Load Bus Stops
+  fetch("/api/stops/")
+    .then(res => res.json())
+    .then(stops => {
+      fromSelect.empty().append('<option disabled selected value="">Select From</option>');
+      toSelect.empty().append('<option disabled selected value="">Select To</option>');
+
+      stops.forEach(stop => {
+        fromSelect.append(new Option(stop.name, stop.name));
+        toSelect.append(new Option(stop.name, stop.name));
+      });
+
+      fromSelect.trigger('change.select2');
+      toSelect.trigger('change.select2');
+    })
+    .catch(err => console.error("❌ Error loading stops:", err));
+
+  // Update Fare
+  function updateFare() {
+    const qty = parseInt(seatsInput.value) || 1;
+    const fare = selectedFarePerSeat * qty;
+    fareDisplay.innerText = fare.toFixed(2);
+  }
+
+  // Seat +/− buttons
+  plusBtn.addEventListener("click", () => {
+    seatsInput.value = parseInt(seatsInput.value) + 1;
+    updateFare();
+  });
+
+  minusBtn.addEventListener("click", () => {
+    if (parseInt(seatsInput.value) > 1) {
+      seatsInput.value = parseInt(seatsInput.value) - 1;
+      updateFare();
+    }
+  });
+
+  // Manual input change
+  seatsInput.addEventListener("input", updateFare);
+
+  // Initial fare calculation
+  updateFare();
+});
+
+
+
+
+
+const form = document.getElementById("manualBookingForm");
+form.addEventListener("submit", function (e) {
+  e.preventDefault(); // Prevent default form submission (optional)
+
+  const formData = new FormData(form);
+
+  fetch(form.action, {
+    method: "POST",
+    body: formData,
+    headers: {
+      "X-Requested-With": "XMLHttpRequest",
+    },
+  })
+    .then((res) => {
+      if (res.redirected) {
+        // ✅ Redirect to success page
+        window.location.href = res.url;
+      } else {
+        return res.text().then((text) => {
+          console.error("❌ Booking failed:", text);
+          alert("Booking failed. Check console for details.");
+        });
+      }
+    })
+    .catch((err) => {
+      console.error("❌ Error submitting form:", err);
+      alert("Something went wrong while booking.");
+    });
+});
+</script>
+
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<script>
+    function handleScanSuccess(decodedText, decodedResult) {
+      document.getElementById("result").innerText = "🔍 Verifying ticket...";
+
+      fetch(`/conductor/verify-ticket/?data=${encodeURIComponent(decodedText)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.valid) {
+            document.getElementById("result").innerHTML = `
+              ✅ <strong>Valid Ticket</strong><br>
+              <strong>Booking ID:</strong> ${data.booking_id}<br>
+              <strong>Route:</strong> ${data.route}<br>
+              <strong>From:</strong> ${data.source}<br>
+              <strong>To:</strong> ${data.destination}<br>
+              <strong>Seats:</strong> ${data.seats}<br>
+              <strong>Fare:</strong> ₹${data.fare}<br>
+              <em>${data.message}</em>
+            `;
+          } else {
+            document.getElementById("result").innerHTML = `❌ <span class="error">>${data.message || "Invalid ticket"}</span>`;
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          document.getElementById("result").innerHTML = `❌ <span class="error">Error verifying ticket</span>`;
+        });
+    }
+
+    function handleScanFailure(error) {
+      // console.warn("Scan failed: ", error);
+    }
+
+    const scanner = new Html5QrcodeScanner("scanner", {
+      fps: 10,
+      qrbox: 250
+    });
+
+    scanner.render(handleScanSuccess, handleScanFailure);
+  </script>
+
+
+
+
+<!--booking analysis code -->
+
+<script>
+  document.addEventListener("DOMContentLoaded", async () => {
+    try {
+      const response = await fetch("/conductor/booking-analysis/");
+      const data = await response.json();
+
+      document.getElementById("total-seats").textContent = data.total_seats;
+      document.getElementById("total-fare").textContent = `₹${data.total_fare}`;
+      document.getElementById("total-bookings").textContent = data.total_bookings;
+      document.getElementById("manual-count").textContent = data.manual_count;
+      document.getElementById("online-count").textContent = data.online_count;
+    } catch (error) {
+      console.error("❌ Failed to load booking stats:", error);
+    }
+  });
+</script>
+
+
+
+<!--todays booking table-->
+<script>
+  document.addEventListener("DOMContentLoaded", async () => {
+    const tableBody = document.getElementById("bookings-table-body");
+
+    try {
+      const response = await fetch("/conductor/todays-bookings/");
+      const data = await response.json();
+
+      if (data.bookings.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-gray-500">No bookings found for today.</td></tr>`;
+        return;
+      }
+
+      tableBody.innerHTML = ""; // Clear existing rows
+
+      data.bookings.forEach((booking, index) => {
+        const typeColor =
+          booking.type === "Manual" ? "text-green-500" :
+          booking.type === "Online" ? "text-blue-500" :
+          "text-gray-500";
+
+        const rowHTML = `
+          <tr class="hover:bg-gray-100">
+            <td class="p-2">${index + 1}</td>
+            <td class="p-2">${booking.id}</td>
+            <td class="p-2">${booking.route}</td>
+            <td class="p-2">${booking.source}</td>
+            <td class="p-2">${booking.destination}</td>
+            <td class="p-2">${booking.seats}</td>
+            <td class="p-2">₹${booking.fare}</td>
+            <td class="p-2 ${typeColor}">
+              <span class="badge">${booking.type}</span>
+            </td>
+            <td class="p-2">${booking.time}</td>
+          </tr>
+        `;
+        tableBody.insertAdjacentHTML("beforeend", rowHTML);
+      });
+    } catch (error) {
+      console.error("❌ Error loading today's bookings:", error);
+      tableBody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-red-500">Error loading bookings.</td></tr>`;
+    }
+  });
+</script>
+
+
+
+
+<!-- JS Script for fare calculation -->
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h2>Complaint Submitted</h2>
+    <p><strong>Complaint ID:</strong> {{ complaint.id }}</p>
+    <p><strong>Description:</strong> {{ complaint.description }}</p>
+    <p><strong>Passenger Name:</strong> {{ complaint.passenger_name }}</p>
+    <p><strong>Contact Number:</strong> {{ complaint.contact_number }}</p>
+    <p><strong>Address:</strong> {{ complaint.address }}</p>
+    <p><strong>Bus:</strong> {{ complaint.bus.bus_id|default:"Not specified" }}</p>
+    <p><strong>Route:</strong> {{ complaint.route.route_no|default:"Not specified" }} ({{ complaint.route.source|default:"" }} to {{ complaint.route.destination|default:"" }})</p>
+    <p><strong>Status:</strong> {{ complaint.status }}</p>
+    <p><strong>Submitted At:</strong> {{ complaint.created_at }}</p>
+    {% if complaint.images.all %}
+        <p><strong>Images:</strong></p>
+        {% for image in complaint.images.all %}
+            <img src="{{ image.image.url }}" alt="Complaint Image" style="max-width: 200px; margin-right: 10px;">
+        {% endfor %}
+    {% else %}
+        <p><strong>Images:</strong> No images uploaded</p>
+    {% endif %}
+    <a href="{% url 'report_complaint' %}" class="btn btn-primary">Submit Another Complaint</a>
+    <a href="{% url 'home' %}" class="btn btn-secondary">Back to Home</a>
+</div>
+{% endblock %}

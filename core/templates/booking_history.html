@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Bookings</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f9fb;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #2a5d9f;
+      margin-bottom: 30px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #2a5d9f;
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    .no-bookings {
+      text-align: center;
+      font-size: 18px;
+      color: #888;
+      margin-top: 40px;
+    }
+
+    a.back-home {
+      display: inline-block;
+      margin-top: 20px;
+      text-decoration: none;
+      color: #2a5d9f;
+      font-weight: bold;
+    }
+
+    a.back-home:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>My Bookings</h2>
+
+    {% if bookings %}
+    <table>
+      <thead>
+        <tr>
+          <th>Booking ID</th>
+          <th>Route</th>
+          <th>Seats</th>
+          <th>Fare</th>
+          <th>Date & Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for booking in bookings %}
+        <tr>
+          <td>{{ booking.id }}</td>
+          <td>{{ booking.route }}</td>
+          <td>{{ booking.seats }}</td>
+          <td>₹{{ booking.fare }}</td>
+          <td>{{ booking.booking_time|date:"Y-m-d H:i" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <p class="no-bookings">No bookings found.</p>
+    {% endif %}
+
+    <a href="/" class="back-home">← Back to Home</a>
+  </div>
+
+</body>
+</html>

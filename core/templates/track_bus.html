@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h2>Track Bus {{ bus_id }}</h2>
+    <div id="map" style="height: 400px;"></div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
+<script>
+    var map = L.map('map').setView([19.0330, 73.0297], 13); // Navi Mumbai coordinates
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    function updateBusLocation() {
+        fetch('/api/bus_locations/{{ bus_id }}/')
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(loc => {
+                    L.marker([loc.lat, loc.lng]).addTo(map);
+                });
+            });
+    }
+    setInterval(updateBusLocation, 5000); // Update every 5 seconds
+    updateBusLocation();
+</script>
+{% endblock %}

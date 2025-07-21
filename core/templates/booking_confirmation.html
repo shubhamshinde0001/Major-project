@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Booking Confirmation</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 20px;
+    }
+    .confirmation {
+      background: white;
+      padding: 30px;
+      max-width: 500px;
+      margin: auto;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #ccc;
+    }
+    h2 {
+      color: #2c7a7b;
+    }
+    .label {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="confirmation">
+    <h2>🎉 Booking Confirmed!</h2>
+    <p><span class="label">Booking ID:</span> {{ booking.id }}</p>
+    <p><span class="label">Route:</span> {{ booking.route }} — {{ booking.source }} → {{ booking.destination }}</p>
+    <p><span class="label">Seats Booked:</span> {{ booking.seats }}</p>
+    <p><span class="label">Total Fare:</span> ₹{{ booking.fare }}</p>
+    <p><span class="label">Booking Time:</span> {{ booking.booking_time }}</p>
+
+    {% if booking.qr_code %}
+      <h4 class="mt-4">🎟️ Your Ticket QR Code:</h4>
+      <img src="{{ booking.qr_code.url }}" alt="QR Code" width="200">
+    {% endif %}
+
+    <a href="/" class="home-button">🏠 Return to Home</a>
+  </div>
+</body>
+</html>
