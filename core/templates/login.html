@@ -1,11 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login - NMMT</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            text-align: center;
+            padding-top: 50px;
+        }
 
-{% block content %}
-<div class="container">
-    <h2>Login</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Login</button>
+        h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        form {
+            background-color: #ffffff;
+            padding: 30px;
+            display: inline-block;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 400px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        button {
+            background-color: rgb(42, 99, 165);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: rgb(30, 75, 125);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>WELCOME TO NMMT</h1>
+    <h2>LOGIN TO THE DASHBOARD</h2>
+
+    <form action="login.php" method="POST">
+        <label for="username">Username:</label><br>
+        <input type="text" id="username" name="username" required><br>
+
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password" required><br>
+
+        <label for="mobile">Mobile Number:</label><br>
+        <input type="text" id="mobile" name="mobile" required><br>
+
+        <button type="submit">LOGIN</button>
+        <button type="button" onclick="location.href='signup.html'">SIGN-UP</button>
+       
     </form>
-</div>
-{% endblock %}
+
+</body>
+</html>

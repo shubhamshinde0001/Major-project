@@ -207,7 +207,7 @@ def create_order(request):
 
 
 from django.contrib.auth.models import User
-user = User.objects.first()
+#user = User.objects.first()
 
 
 @csrf_exempt

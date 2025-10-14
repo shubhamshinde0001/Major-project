@@ -3,12 +3,13 @@ from .models import Bus, BusStop, RouteStop, Route, Schedule, Booking, LostAndFo
 from django.contrib.auth.models import Group
 from django.utils.html import format_html
 
-
+'''
 def create_groups():
     Group.objects.get_or_create(name='conductor')
     Group.objects.get_or_create(name='passenger')
 
 create_groups()
+'''
 
 admin.site.register(Bus)
 admin.site.register(Route)

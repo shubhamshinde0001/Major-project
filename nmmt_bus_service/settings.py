@@ -79,10 +79,10 @@ WSGI_APPLICATION = 'nmmt_bus_service.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'bus_siva',
-        'USER': 'bus_siva_user',
-        'PASSWORD': 'OtAogMLVwya1GCBzhTTgYzJMol2wLJOs',
-        'HOST': 'dpg-d230bpje5dus73a3u14g-a.oregon-postgres.render.com',
+        'NAME': 'sept12',
+        'USER': 'sept12_user',
+        'PASSWORD': 'tnpuP5zzvN3BTw0V0gvx7QaOhwKFkB3Q',
+        'HOST': 'dpg-d3ln351r0fns73e4pu70-a.oregon-postgres.render.com',
         'PORT': '5432',
         'OPTIONS': {
             'sslmode': 'require',  # Render requires SSL for external connections
