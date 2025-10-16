@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Conductor Signup</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        body { font-family: Arial, sans-serif; background: #f6f7fb; }
+        .container { width: 400px; margin: 60px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #333; }
+        form { margin-top: 20px; }
+        input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 8px; }
+        button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .messages { color: green; text-align: center; margin-bottom: 10px; }
+        .errorlist { color: red; list-style-type: none; padding: 0; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Conductor Signup</h2>
+
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <label for="id_full_name">Full Name</label>
+        {{ form.full_name }}
+
+        <label for="id_email">Email</label>
+        {{ form.email }}
+
+        <label for="id_contact_number">Contact Number</label>
+        {{ form.contact_number }}
+
+        <label for="id_license_number">License Number</label>
+        {{ form.license_number }}
+
+        <label for="id_profile_picture">Profile Picture (optional)</label>
+        {{ form.profile_picture }}
+
+        <label for="id_password">Password</label>
+        {{ form.password }}
+
+        <label for="id_confirm_password">Confirm Password</label>
+        {{ form.confirm_password }}
+
+        <button type="submit">Sign Up</button>
+    </form>
+
+    <p style="text-align:center;margin-top:15px;">
+        Already have an account? <a href="{% url 'conductor_login' %}">Login here</a>
+    </p>
+</div>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard - NMMT</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            text-align: center;
+            padding-top: 50px;
+        }
+
+        h1 {
+            color: rgb(42, 99, 165);
+            font-size: 36px;
+        }
+
+        .dashboard {
+            background-color: white;
+            display: inline-block;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 500px;
+            text-align: left;
+        }
+
+        .logout-btn {
+            background-color: rgb(42, 99, 165);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .logout-btn:hover {
+            background-color: rgb(30, 75, 125);
+        }
+
+        p {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>USER PROFILE</h1>
+
+    <div class="dashboard">
+        <h2>Hello, {{ profile.full_name|default:user.username }} 👋</h2>
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Age Group:</strong> {{ profile.age_group|capfirst }}</p>
+        <p><strong>Gender:</strong> {{ user.gender|capfirst }}</p>
+        <p><strong>Mobile:</strong> {{ profile.mobile }}</p>
+
+    </div>
+
+</body>
+</html>

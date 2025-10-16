@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us – NMMT</title>
+  <style>
+    :root{
+      --primary:#0078FF;
+      --secondary:#00BFA6;
+      --background:#F3F6FB;
+      --text:#0E1726;
+      --muted:#64748B;
+      --card-bg:#ffffff;
+      --radius:16px;
+    }
+
+    body{
+      font-family:'Segoe UI', Roboto, sans-serif;
+      background:var(--background);
+      color:var(--text);
+      margin:0;
+      padding:0;
+    }
+
+    header{
+      background:linear-gradient(120deg,var(--primary),var(--secondary));
+      color:white;
+      text-align:center;
+      padding:40px 20px 60px;
+      border-bottom-left-radius:80px;
+      border-bottom-right-radius:80px;
+      box-shadow:0 6px 25px rgba(0,0,0,0.2);
+    }
+    header h1{
+      font-size:32px;
+      margin-bottom:10px;
+    }
+    header p{
+      font-size:15px;
+      opacity:0.9;
+    }
+
+    .container{
+      max-width:900px;
+      margin: -40px auto 40px;
+      padding:40px 20px 60px;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: 0 6px 25px rgba(0,0,0,0.1);
+    }
+
+    h2{
+      color: var(--primary);
+      margin-bottom: 20px;
+    }
+
+    .contact-item{
+      margin-bottom: 20px;
+      font-size: 16px;
+    }
+    .contact-item strong{
+      color: var(--primary);
+    }
+
+    .contact-form{
+      display:flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .contact-form input, .contact-form textarea{
+      padding:12px;
+      border-radius:12px;
+      border:1px solid #ccc;
+      width:100%;
+      font-size: 15px;
+      font-family:'Segoe UI', Roboto, sans-serif;
+    }
+    .contact-form button{
+      background: var(--primary);
+      color:white;
+      padding:12px;
+      border:none;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:600;
+      transition: 0.3s;
+    }
+    .contact-form button:hover{
+      background: #0056b3;
+    }
+
+    .back-btn{
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+    }
+    .back-btn a{
+      background-color: var(--primary);
+      color: white;
+      border-radius: 12px;
+      padding: 10px 25px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: 0.3s;
+    }
+    .back-btn a:hover{
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Contact NMMT</h1>
+    <p>We are here to assist you. Reach out anytime!</p>
+  </header>
+
+  <div class="container">
+    <h2>Contact Information</h2>
+    <div class="contact-item">📞 <strong>Head Office:</strong> +91-98765-43210,+91-99887-66554 </div>
+    <div class="contact-item">📞 <strong>Passenger Support:</strong> +91-91234-56789,+91-98765-43212 </div>
+    <div class="contact-item">✉️ <strong>Email:</strong> support@nmmt.com</div>
+    <div class="contact-item">🏢 <strong>Address:</strong> NMMT Head Office, Mumbai, India</div>
+
+
+    <div class="back-btn">
+      <a href="/">← Back to Home</a>
+    </div>
+  </div>
+</body>
+</html>

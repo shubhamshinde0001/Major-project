@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from datetime import datetime, timedelta
 
 class Bus(models.Model):
     bus_id = models.CharField(max_length=10, unique=True)
@@ -23,16 +24,24 @@ class Route(models.Model):
         return f"{self.route_no}: {self.source} to {self.destination}"
 
 class Schedule(models.Model):
-    bus = models.ForeignKey(Bus, on_delete=models.CASCADE)
-    route = models.ForeignKey(Route, on_delete=models.CASCADE)
-    departure_time = models.DateTimeField()
+    bus = models.ForeignKey('Bus', on_delete=models.CASCADE)
+    route = models.ForeignKey('Route', on_delete=models.CASCADE)
+    departure_time = models.TimeField()
     available_seats = models.IntegerField()
+
+    class Meta:
+        unique_together = ('bus', 'route', 'departure_time')  # avoid duplicates
 
     def __str__(self):
         return f"{self.bus} - {self.route} at {self.departure_time}"
 
+    def get_today_departure(self):
+        today = datetime.now().date()
+        return datetime.combine(today, self.departure_time)
+
+
 class Booking(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     route = models.CharField(max_length=100, null=True)
     source = models.CharField(max_length=100, null=True)
     destination = models.CharField(max_length=100, null=True)
@@ -121,3 +130,32 @@ class RouteStop(models.Model):
 
     def __str__(self):
         return f"{self.route.route_no} - Stop {self.stop_order}: {self.bus_stop.name}"
+
+
+
+# models.py
+from django.db import models
+from django.contrib.auth.models import User
+
+class UserProfile(models.Model):
+    AGE_CHOICES = [
+        ('child', '0-18'),
+        ('adult', '19-55'),
+        ('old', '56-120'),
+    ]
+
+    GENDER_CHOICES = [
+        ('female', 'Female'),
+        ('male', 'Male'),
+        ('other', 'Other'),
+        ('prefer_not_to_say', 'Prefer not to say'),
+    ]
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userprofile')
+    full_name = models.CharField(max_length=100)
+    age_group = models.CharField(max_length=10, choices=AGE_CHOICES)
+    gender = models.CharField(max_length=20, choices=GENDER_CHOICES)
+    mobile = models.CharField(max_length=15)
+
+    def __str__(self):
+        return self.user.username

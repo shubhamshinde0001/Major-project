@@ -112,6 +112,12 @@
   border: none;
 }
 
+.fancy-hover1:hover {
+  background: linear-gradient(90deg, #285ef19a 0%, #115fd48e 100%);
+  color: white; /* optional for contrast */
+  border: none;
+}
+
 
   </style>
 </head>
@@ -134,16 +140,19 @@
     <!-- Nav Items -->
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav mx-auto">
-        <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Services</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Projects</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Team</a></li>
-        <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
+        <li class="nav-item"><a class="nav-link fancy-hover1" href="#">Home</a></li>
+        <li class="nav-item"><a class="nav-link fancy-hover1" href="services">Services</a></li>
+        <li class="nav-item"><a class="nav-link fancy-hover1" href="#">Projects</a></li>
+        <li class="nav-item"><a class="nav-link fancy-hover1" href="#">Team</a></li>
+        <li class="nav-item"><a class="nav-link fancy-hover1" href="contact">Contact</a></li>
       </ul>
 
       <!-- Login Button -->
       <div class="d-flex">
-        <a href="#" class="btn btn-primary fancy-hover">Login</a>
+        <button class="btn btn-primary fancy-hover" title="Profile">
+  <i class="fas fa-user-circle fa-lg"></i>
+</button>
+
       </div>
     </div>
   </div>
@@ -160,19 +169,37 @@
 
   <h5 class="fw-bold mb-4">👤 User Menu</h5>
   <ul class="list-unstyled">
-    <li class="mb-3"><a href="#" class="text-dark text-decoration-none">Profile</a></li>
+    <li class="mb-3"><a href="profile" class="text-dark text-decoration-none">Profile</a></li>
     <li class="mb-3"><a href="{% url 'my_bookings' %}" class="text-dark text-decoration-none">My Bookings</a></li>
     <li class="mb-3"><a href="#" class="text-dark text-decoration-none">Notifications</a></li>
     <li class="mb-3"><a href="#" class="text-dark text-decoration-none">Help</a></li>
-    <li><a href="#" class="text-dark text-decoration-none">Logout</a></li>
+    <li><a href="logout" class="text-dark text-decoration-none">Logout</a></li>
   </ul>
 </div>
 
 <!-- User Icon Button (fixed at top-left beside main container) -->
 <button id="toggleUserSidebar" class="btn btn-outline-dark rounded-circle shadow-sm"
-        style="position: fixed; top: 30px; left: 70px; width: 58px; height: 58px; z-index: 1100;">
-  <i class="fas fa-user"></i>
+        style="position: fixed; top: 30px; left: 70px; width: 58px; height: 58px; ">
+  <i class="fas fa-bars"></i>
 </button>
+<!-- script for opening the menu bar automatically -->
+<script>
+  const toggleBtn = document.getElementById("toggleUserSidebar");
+  const userSidebar = document.getElementById("userSidebar"); // your existing sidebar
+
+  // when hovered, show sidebar and hide button
+  toggleBtn.addEventListener("mouseenter", () => {
+    userSidebar.style.transform = "translateX(0%)"; // open
+    toggleBtn.style.display = "none"; // hide button
+  });
+
+  // when sidebar is no longer hovered, hide sidebar and show button again
+  userSidebar.addEventListener("mouseleave", () => {
+    userSidebar.style.transform = "translateX(-100%)"; // close
+    toggleBtn.style.display = "block"; // show button again
+  });
+</script>
+
 <div class="slider-wrapper" style="max-width: 95%; margin: 0 auto;">
   <div class="slider-track" id="sliderTrack"></div>
 </div>
@@ -216,7 +243,7 @@
           </div>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-lg fw-bold w-30 mt-5">Search Buses</button>
+        <button type="submit" class="btn btn-primary fancy-hover btn-lg fw-bold w-30 mt-5">Search Buses</button>
       </form>
 
 <script>
@@ -588,11 +615,11 @@ window.addEventListener("DOMContentLoaded", () => {
         box.style.cssText = `
           display: flex;
           align-items: stretch;
-          border: 1px solid #ccc;
+          border: 3px solid #ccc;
           padding: 0;
           border-radius: 28px;
           cursor: pointer;
-          flex: 1;
+          flex: 3;
           min-width: 280px;
           background-color: #fafafa;
           box-shadow: 0 2px 5px rgba(0,0,0,0.5);

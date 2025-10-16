@@ -50,3 +50,24 @@ ComplaintImageFormSet = inlineformset_factory(
     can_delete=False,
     widgets={'image': forms.FileInput(attrs={'class': 'form-control'})}
 )
+
+
+# forms.py
+from django import forms
+from django.contrib.auth.models import User
+from .models import UserProfile
+
+class SignupForm(forms.ModelForm):
+    full_name = forms.CharField(max_length=100)
+    age_group = forms.ChoiceField(choices=UserProfile.AGE_CHOICES)
+    gender = forms.ChoiceField(choices=UserProfile.GENDER_CHOICES)
+    mobile = forms.CharField(max_length=15)
+    password = forms.CharField(widget=forms.PasswordInput)
+
+    class Meta:
+        model = User
+        fields = ['username', 'password', 'email']
+
+class LoginForm(forms.Form):
+    username = forms.CharField(max_length=100)
+    password = forms.CharField(widget=forms.PasswordInput)

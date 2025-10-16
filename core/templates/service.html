@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>NMMT Bus Tracking – Services</title>
+  <style>
+    :root{
+      --primary:#0078FF;
+      --secondary:#00BFA6;
+      --background:#F3F6FB;
+      --text:#0E1726;
+      --muted:#64748B;
+      --card-bg:#ffffff;
+      --radius:16px;
+    }
+    body{
+      font-family:'Segoe UI', Roboto, sans-serif;
+      background:var(--background);
+      color:var(--text);
+      margin:0;
+      padding:0;
+    }
+    header{
+      background:linear-gradient(120deg,var(--primary),var(--secondary));
+      color:white;
+      text-align:center;
+      padding:40px 20px 60px;
+      border-bottom-left-radius:80px;
+      border-bottom-right-radius:80px;
+      box-shadow:0 6px 25px rgba(0,0,0,0.2);
+    }
+    header h1{font-size:32px;margin-bottom:10px;}
+    header p{font-size:15px;opacity:0.9;}
+
+    .container{
+      max-width:900px;
+      margin:-40px auto 40px;
+      padding:0 20px;
+    }
+
+    .services{
+      display:grid;
+      gap:20px;
+    }
+    .service{
+      background:var(--card-bg);
+      border-radius:var(--radius);
+      box-shadow:0 4px 18px rgba(0,0,0,0.08);
+      overflow:hidden;
+      transition:transform .25s ease, box-shadow .25s ease;
+      border:1px solid rgba(0,0,0,0.05);
+    }
+    .service:hover{
+      transform:translateY(-4px);
+      box-shadow:0 8px 22px rgba(0,0,0,0.12);
+    }
+    .service button.head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      width:100%;
+      border:0;
+      background:transparent;
+      padding:18px 22px;
+      font-size:17px;
+      font-weight:600;
+      color:var(--text);
+      cursor:pointer;
+    }
+    .head-left{
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+    .icon{
+      width:40px;
+      height:40px;
+      border-radius:12px;
+      display:grid;
+      place-items:center;
+      color:white;
+      font-size:18px;
+      font-weight:bold;
+    }
+    .icon.blue{background:var(--primary);}
+    .icon.green{background:var(--secondary);}
+    .icon.purple{background:#6F42C1;}
+    .icon.orange{background:#FF8C00;}
+    .chev{
+      font-size:18px;
+      color:var(--muted);
+      transition:transform .3s ease;
+    }
+    .service[aria-expanded="true"] .chev{
+      transform:rotate(90deg);
+      color:var(--primary);
+    }
+
+    .content{
+      max-height:0;
+      overflow:hidden;
+      transition:max-height .35s ease, padding .3s ease;
+      padding:0 22px;
+      background:#FAFBFC;
+    }
+    .service[aria-expanded="true"] .content{
+      max-height:600px;
+      padding:10px 22px 20px;
+      overflow-y:auto;
+    }
+
+    .features{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      font-size:15px;
+    }
+    .feature{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+    }
+    .dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      margin-top:6px;
+      background:var(--primary);
+    }
+    .feature strong{color:var(--text);}
+    .feature .muted{color:var(--muted);font-size:14px;}
+
+    .nested-head{
+      display:flex;
+      justify-content:space-between;
+      width:100%;
+      border:0;
+      background:#f0f0f0;
+      padding:6px 10px;
+      border-radius:8px;
+      cursor:pointer;
+      font-weight:500;
+      margin-top:6px;
+    }
+    .nested-content {
+      max-height:0;
+      overflow-y:hidden;
+      transition:max-height .35s ease, padding .3s ease;
+      margin-top:4px;
+      background:#eef2f7;
+      border-radius:8px;
+      padding:0 10px;
+    }
+    .nested-content[aria-expanded="true"] {
+      max-height:400px;
+      overflow-y:auto;
+      padding:8px 10px;
+    }
+
+    /* Passenger Support tabs */
+    .support-tabs{
+      display:flex;
+      gap:10px;
+      margin-bottom:15px;
+    }
+    .support-tab{
+      flex:1;
+      padding:10px 12px;
+      background:#f0f0f0;
+      text-align:center;
+      border-radius:8px;
+      font-weight:600;
+      cursor:pointer;
+      transition:0.3s;
+    }
+    .support-tab.active{background:var(--primary); color:white;}
+
+    .support-content{
+      max-height:0;
+      overflow-y:hidden;
+      transition:max-height .35s ease, padding .3s ease;
+      background:#FAFBFC;
+      border-radius:8px;
+      padding:0 10px;
+    }
+    .support-content.active{
+      max-height:500px;
+      overflow-y:auto;
+      padding:10px;
+    }
+
+    .chatbox{
+      max-height:200px;
+      overflow-y:auto;
+      background:#eef2f7;
+      border-radius:8px;
+      padding:10px;
+      margin-top:10px;
+    }
+    .chat-message{margin-bottom:8px; padding:6px 10px; border-radius:6px;}
+    .chat-message.bot{background:#0078ff;color:white;}
+    .chat-message.user{background:#e0e0e0;color:#0E1726;}
+    .chat-input{display:flex; gap:6px; margin-top:6px;}
+    .chat-input input{flex:1; padding:6px 10px; border-radius:6px; border:1px solid #ccc;}
+    .chat-input button{padding:6px 12px;border:none;background:var(--primary);color:white;border-radius:6px;cursor:pointer;}
+
+    @media(max-width:600px){
+      header h1{font-size:26px;}
+      .service button.head{font-size:15px;}
+      .icon{width:34px;height:34px;}
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>NMMT Bus Services</h1>
+  <p>Tap any service to explore its key features and benefits.</p>
+</header>
+
+<div class="container">
+  <div class="services">
+    <!-- 1. Real-time Tracking -->
+    <section class="service" aria-expanded="false">
+      <button class="head">
+        <div class="head-left">
+          <div class="icon blue">🚌</div>
+          <span>Real-time Bus Tracking</span>
+        </div>
+        <span class="chev">▶</span>
+      </button>
+      <div class="content">
+        <div class="features">
+          <div class="feature"><div class="dot"></div><div><strong>Live Location:</strong> Track your bus on map in real-time.</div></div>
+          <div class="feature"><div class="dot"></div><div><strong>Accurate ETA:</strong> See expected arrival time instantly.</div></div>
+          <div class="feature"><div class="dot"></div><div><strong>Route Playback:</strong> View recent travel path of your selected bus.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Ticket Price -->
+    <section class="service" aria-expanded="false">
+      <button class="head">
+        <div class="head-left">
+          <div class="icon green">💰</div>
+          <span>Ticket Price</span>
+        </div>
+        <span class="chev">▶</span>
+      </button>
+      <div class="content">
+        <div class="features">
+          <div class="feature"><div class="dot"></div><div><strong>AC Bus:</strong> Rs. 20 – Rs. 50 depending on distance.</div></div>
+          <div class="feature"><div class="dot"></div><div><strong>Non-AC Bus:</strong> Rs. 10 – Rs. 30 depending on distance.</div></div>
+          <div class="feature"><div class="dot"></div><div><strong>Monthly Pass:</strong> Rs. 500 – Rs. 1500 depending on routes.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Timetable -->
+    <section class="service" aria-expanded="false">
+      <button class="head">
+        <div class="head-left">
+          <div class="icon purple">🕒</div>
+          <span>Timetable & Route Planner</span>
+        </div>
+        <span class="chev">▶</span>
+      </button>
+      <div class="content">
+        <div class="features">
+          <div class="feature">
+            <div class="dot"></div>
+            <div>
+              <strong>Daily Timetables:</strong>
+              <button class="nested-head" data-target="nested-timetable">View Routes & Timings ▶</button>
+              <div class="nested-content" id="nested-timetable" aria-expanded="false">
+                <div class="features">
+                  <div class="feature"><strong>1 AC:</strong> Airoli → Thane — 06:30, 09:30, 12:30</div>
+                  <div class="feature"><strong>2 AC:</strong> Thane → Purna — 06:45, 09:45, 12:45</div>
+                  <div class="feature"><strong>3 AC:</strong> Vashi → Thane — 07:00, 10:00, 13:00</div>
+                  <div class="feature"><strong>4 AC:</strong> Mahape → Thane — 06:50, 09:50, 12:50</div>
+                   <div class="feature"><strong>5 AC:</strong> Mahape Junction → Thane (Cidco) — 06:50, 09:50, 12:50</div>
+                   <div class="feature"><strong>6 AC:</strong> Thane(cidco) → Bhiwandi — 06:50, 09:50, 12:50</div>
+                   <div class="feature"><strong>7 AC:</strong> Vashi Rly Stn → Thane (Cidco) — 07:05, 10:05, 13:05</div>
+                    <div class="feature"><strong>8 AC:</strong> Vashi Rly Stn → Thane (Cidco) Via Ghansoli Village — 07:20, 10:20, 13:20</div>
+                   <div class="feature"><strong>9 AC:</strong> Vashi Rly Stn → Ghansoli Depot — 06:40, 09:40, 12:40</div>
+                    <div class="feature"><strong>10 AC:</strong> Sanpada Rly Stn → Ghansoli Gharonda Via APMC Market — 07:00, 10:00, 13:00</div>
+                   <div class="feature"><strong>11 AC:</strong> Sanpada Rly Stn → Thane (Cidco) Via MIDC — 07:15, 10:15, 13:15</div>
+                   <div class="feature"><strong>12 AC:</strong> Mahape Junction → Thane (Cidco) — 06:50, 09:50, 12:50</div>
+                   <div class="feature"><strong>14 AC:</strong> Nerul Sector 50 → DY Patil College (Nerul LP) — 06:45, 09:45, 12:45</div>
+                   <div class="feature"><strong>15 AC:</strong> Nerul Sector 46/48 → DY Patil College (Nerul LP) — 07:00, 10:00, 13:00</div>
+                   <div class="feature"><strong>16 AC:</strong> Belapur Rly Stn → Kharkopar Rly Stn (Ulwe) — 07:15, 10:15, 13:15</div>
+                   <div class="feature"><strong>17 AC:</strong> Nerul Rly Stn (E) → Baman Dongri Rly Stn (Ulwe) — 06:50, 09:50, 12:50</div>
+                   <div class="feature"><strong>18 AC:</strong> Ghansoli Depot → Kharkopar Rly Stn (Ulwe) Via Nerul (W) — 07:05, 10:05, 13:05</div>
+                   <div class="feature"><strong>20 AC:</strong> Ghansoli Depot → Nerul Sector 46/48 — 07:20, 10:20, 13:20</div>
+                   <div class="feature"><strong>21 AC:</strong> Vashi Sector 07 → Artist Colony (CBD) Via Nerul (E) — 06:45, 09:45, 12:45</div>
+                    <div class="feature"><strong>22 AC:</strong> Vashi Sector 07 → Kharghar CISF Via Nerul (W) — 06:45, 09:45, 12:45</div>
+                    <div class="feature"><strong>23 AC:</strong> Artist Colony (CBD) → Kharkopar Rly Stn (Ulwe) — 07:00, 10:00, 13:00</div>
+                    <div class="feature"><strong>24 AC:</strong> Panvel Rly Stn (W) → Thane (Cidco) — 06:55, 09:55, 12:55</div>
+                    <div class="feature"><strong>30:</strong> Roadpali (Kalamboli) → Uran — 07:10, 10:10, 13:10</div>
+                    <div class="feature"><strong>31 AC:</strong> Kopar Khairane Bus Stn → Uran — 07:20, 10:20, 13:20</div>
+                    <div class="feature"><strong>40:</strong> Vashi Rly Stn → Dahisar Village Via Turbhe Naka — 06:50, 09:50, 12:50</div>
+                    <div class="feature"><strong>41 AC:</strong> Vashi Rly Stn → Dombivli Rly Stn (W) Via Turbhe Naka — 07:05, 10:05, 13:05</div>
+                    <div class="feature"><strong>42 AC:</strong> Vashi Rly Stn → Dombivli Rly Stn (W) Via APMC Market / Kopar Khairane — 07:15, 10:15, 13:15</div>
+                    <div class="feature"><strong>43 AC:</strong> Kharghar Rly Stn → Taloja Phase 2 Via Gharkul — 06:40, 09:40, 12:40</div>
+                    <div class="feature"><strong>44 AC:</strong> Belapur Rly Stn → Dombivli Rly Stn (W) Via Turbhe Naka — 06:55, 09:55, 12:55</div>
+                    <div class="feature"><strong>45 AC:</strong> Kharghar Rly Stn → Taloja Phase 2 Via Utsav Chowk — 07:05, 10:05, 13:05</div>
+                    <div class="feature"><strong>46 AC:</strong> Vashi Rly Stn → Badlapur Via Turbhe Naka — 07:10, 10:10, 13:10</div>
+                    <div class="feature"><strong>47 AC:</strong> NMMC Office (Belapur) → Badlapur Via Taloja MIDC — 07:20, 10:20, 13:20</div>
+                    <div class="feature"><strong>48:</strong> Belapur Rly Stn → Vashivali Village (Rasayani) — 06:50, 09:50, 12:50</div>
+                    <div class="feature"><strong>49:</strong> Belapur Rly Stn → Karjat Rly Stn — 07:00, 10:00, 13:00</div>
+                    <div class="feature"><strong>50 AC:</strong> Ghansoli Depot → Panvel Rly Stn (W) — 07:10, 10:10, 13:10</div>
+                    <div class="feature"><strong>52 AC:</strong> Belapur Rly Stn → Taloja Phase 2 Via Kharghar — 06:45, 09:45, 12:45</div>
+                    <div class="feature"><strong>53 AC:</strong> Kharghar Rly Stn → Shilp Valley Sector 36 Via Gharkul — 07:05, 10:05, 13:05</div>
+                    <div class="feature"><strong>54 AC:</strong> Kharghar Rly Stn → RAF Colony Via Jalvayu — 07:20, 10:20, 13:20</div>
+                    <div class="feature"><strong>55 AC:</strong> Ghansoli Depot → Taloja Phase 1 Via Kharghar — 06:55, 09:55, 12:55</div>
+                    <div class="feature"><strong>56 AC:</strong> Mansarovar Rly Stn → CP Office (Roadpali) Via Kalamboli — 07:10, 10:10, 13:10</div>
+                    <div class="feature"><strong>58:</strong> Belapur Rly Stn → Khopoli Village — 06:40, 09:40, 12:40</div>
+                    <div class="feature"><strong>59:</strong> Khandeshwar Rly Stn → Panvel Rly Stn (E) Via Khanda Colony — 07:00, 10:00, 13:00</div>
+                    <div class="feature"><strong>60 AC:</strong> Vashi Rly Stn → Kalyan Rly Stn (W) Via Turbhe Naka — 07:15, 10:15, 13:15</div>
+                    <div class="feature"><strong>61 AC:</strong> Belapur Rly Stn → Kalyan Rly Stn (W) Via Turbhe Naka — 06:50, 09:50, 12:50</div>
+                    <div class="feature"><strong>62 AC:</strong> Vashi Rly Stn → Kalyan Rly Stn (W) Via Kopar Khairane — 07:05, 10:05, 13:05</div>
+                    <div class="feature"><strong>64 AC:</strong> Digha Village → Kalyan Rly Stn (W) Via Airoli — 06:45, 09:45, 12:45</div>
+                    <div class="feature"><strong>65 AC:</strong> Patni → Kalyan Rly Stn (W) Via Airoli / MIDC — 07:00, 10:00, 13:00</div>
+                    <div class="feature"><strong>66 AC:</strong> Ghansoli Rly Stn (E) → Kalyan Rly Stn (W) — 07:10, 10:10, 13:10</div>
+                    <div class="feature"><strong>71:</strong> Belapur Rly Stn → Kalyan Rly Stn (W) Via Taloja MIDC — 06:50, 09:50, 12:50</div>
+                    <div class="feature"><strong>73 AC:</strong> Panvel Rly Stn (W) → Kalyan Rly Stn (W) Via Taloja MIDC — 07:05, 10:05, 13:05</div>
+                    <div class="feature"><strong>75:</strong> Panvel Rly Stn (W) → Sai Nagar — 07:15, 10:15, 13:15</div>
+                    <div class="feature"><strong>76:</strong> Panvel Rly Stn (W) → Karanjade — 06:50, 09:50, 12:50</div>
+                    <div class="feature"><strong>77:</strong> Panvel Rly Stn (E) → Mahalaxmi Nagar (Nere Village) — 07:05, 10:05, 13:05</div>
+                    <div class="feature"><strong>81 AC:</strong> Vashi Rly Stn → Mumbra Rly Stn Via Turbhe Naka — 06:45, 09:45, 12:45</div>
+                    <div class="feature"><strong>82 AC:</strong> Vashi Rly Stn → Diva Rly Stn (E) Via Turbhe Naka — 07:00, 10:00, 13:00</div>
+                    <div class="feature"><strong>83 AC:</strong> Airoli Bus Stn → Thane (Cidco) Via Patni — 07:15, 10:15, 13:15</div>
+                    <div class="feature"><strong>84 AC:</strong> Vashi Rly Stn → Mumbra Rly Stn Via Kopar Khairane — 06:50, 09:50, 12:50</div>
+                    <div class="feature"><strong>86:</strong> Thane (Cidco) → Diva Rly Sun (E) Via Kalwa / Mumbra — 07:05, 10:05, 13:05</div>
+                    <div class="feature"><strong>100 AC:</strong> Vashi Rly Stn → Lokmanya Nagar (Thane) Via Mulund Gawanpada — 06:45, 09:45, 12:45</div>
+                    <div class="feature"><strong>105 AC:</strong> Panvel Rly Stn (W) → Bandra Rly Stn (W) — 07:00, 10:00, 13:00</div>
+                    <div class="feature"><strong>106 AC:</strong> Panvel Rly Stn (W) → World Trade Centre Via Freeway — 07:15, 10:15, 13:15</div>
+                    <div class="feature"><strong>107 AC:</strong> CBD Belapur Bus Stn → World Trade Centre Via Freeway — 06:50, 09:50, 12:50</div>
+                    <div class="feature"><strong>108 AC:</strong> Nerul Sector 46/48 → World Trade Centre Via Freeway — 07:05, 10:05, 13:05</div>
+                    <div class="feature"><strong>109 AC:</strong> Digha Village → Nahur Rly Stn (E) Via Patni — 07:15, 10:15, 13:15</div>
+                    <div class="feature"><strong>110 AC:</strong> Kharghar CISF → World Trade Centre Via Freeway — 06:45, 09:45, 12:45</div>
+                    <div class="feature"><strong>114 AC:</strong> Ghansoli Gharonda → World Trade Centre Via Freeway — 07:00, 10:00, 13:00</div>
+                    <div class="feature"><strong>115 AC:</strong> Kharkopar Rly Stn (Ulwe) → World Trade Centre Via Freeway — 07:15, 10:15, 13:15</div>
+                    <div class="feature"><strong>116 AC:</strong> Nerul Rly Stn (E) → World Trade Centre Via Atal Setu — 06:50, 09:50, 12:50</div>
+                    <div class="feature"><strong>117 AC:</strong> Kharghar CISF → World Trade Centre Via Atal Setu — 07:05, 10:05, 13:05</div>
+                    <div class="feature"><strong>125 AC:</strong> Kharghar CISF → Borivali Rly Stn (E) — 07:15, 10:15, 13:15</div>
+                    <div class="feature"><strong>144 AC:</strong> Airoli Bus Stn → Andheri Rly Stn (E) — 06:45, 09:45, 12:45</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="feature"><div class="dot"></div><div><strong>Smart Planner:</strong> Find best route between destinations.</div></div>
+          <div class="feature"><div class="dot"></div><div><strong>Alternate Routes:</strong> Get suggestions during delays.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Passenger Support -->
+    <section class="service" aria-expanded="false">
+      <button class="head">
+        <div class="head-left">
+          <div class="icon orange">💬</div>
+          <span>Passenger Support</span>
+        </div>
+        <span class="chev">▶</span>
+      </button>
+      <div class="content">
+        <!-- Tabs -->
+        <div class="support-tabs">
+          <div class="support-tab active" data-target="feedback">Feedback</div>
+          <div class="support-tab" data-target="helpcenter">Help Center</div>
+          <div class="support-tab" data-target="chatbot">Chatbot</div>
+        </div>
+
+        <!-- Feedback Content -->
+        <div class="support-content active" id="feedback">
+          <div class="features">
+            <div class="feature"><div class="dot"></div><div><strong>Submit Complaints:</strong> File complaints or suggestions here.</div></div>
+            <div class="feature"><div class="dot"></div><div><strong>Lost Items:</strong> Report lost items and receive assistance.</div></div>
+          </div>
+        </div>
+
+        <!-- Help Center Content -->
+        <div class="support-content" id="helpcenter">
+       <div class="features">
+    <div class="feature"><div class="dot"></div><div><strong>Booking Tickets:</strong> Go to "Book Ticket", select route, choose AC/Non-AC, and pay online securely.</div></div>
+    <div class="feature"><div class="dot"></div><div><strong>Check Routes & Timings:</strong> Visit "Routes & Timings" page before journey for latest schedules.</div></div>
+    <div class="feature"><div class="dot"></div><div><strong>Payments & Refunds:</strong> Payments via Razorpay. Refunds processed in 5–7 working days; contact support if delayed.</div></div>
+    <div class="feature"><div class="dot"></div><div><strong>Passenger Pass:</strong> Apply for monthly/quarterly passes online and check validity from dashboard.</div></div>
+    <div class="feature"><div class="dot"></div><div><strong>Lost & Found:</strong> Report lost items; get updates on claim status and retrieval procedures.</div></div>
+    <div class="feature"><div class="dot"></div><div><strong>Accessibility Assistance:</strong> Information on wheelchair-friendly buses, priority seating, and helpline numbers.</div></div>
+    <div class="feature"><div class="dot"></div><div><strong>Complaint Submission:</strong> File complaints about bus delays, driver behavior, or ticket issues; track status online.</div></div>
+    <div class="feature"><div class="dot"></div><div><strong>Safety Guidelines:</strong> Follow on-board safety protocols, emergency contacts, and COVID-related precautions.</div></div>
+    <div class="feature"><div class="dot"></div><div><strong>Travel Alerts:</strong> Receive notifications about route changes, cancellations, or major traffic disruptions.</div></div>
+  </div>
+</div>
+
+        <!-- Chatbot Content -->
+        <div class="support-content" id="chatbot">
+          <div class="chatbox" id="chatbox">
+            <div class="chat-message bot">👋 Hello! I'm your NMMT Assistant. Ask me about tickets, routes, or timings.</div>
+          </div>
+          <div class="chat-input">
+            <input id="chatInput" type="text" placeholder="Type your question..." />
+            <button id="sendBtn">Send</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+  // Main accordion toggle
+  const services = document.querySelectorAll('.service');
+  services.forEach(service => {
+    const btn = service.querySelector('.head');
+    btn.addEventListener('click', () => {
+      const open = service.getAttribute('aria-expanded') === 'true';
+      services.forEach(s => s.setAttribute('aria-expanded','false'));
+      service.setAttribute('aria-expanded', !open);
+    });
+  });
+
+  // Nested Timetable toggle
+  const nestedButtons = document.querySelectorAll('.nested-head');
+  nestedButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetId = btn.dataset.target;
+      const nested = document.getElementById(targetId);
+      const expanded = nested.getAttribute('aria-expanded') === 'true';
+      nested.setAttribute('aria-expanded', !expanded);
+    });
+  });
+
+  // Passenger Support Tabs
+  const supportTabs = document.querySelectorAll('.support-tab');
+  supportTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      supportTabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const targetId = tab.dataset.target;
+      document.querySelectorAll('.support-content').forEach(content => {
+        if(content.id === targetId){
+          content.classList.add('active');
+        } else {
+          content.classList.remove('active');
+        }
+      });
+    });
+  });
+
+  // Chatbot functionality
+  const chatbox = document.getElementById('chatbox');
+  const chatInput = document.getElementById('chatInput');
+  const sendBtn = document.getElementById('sendBtn');
+
+  const responses = [
+  {
+    keywords: ["ticket", "fare", "price", "cost", "charge"],
+    reply: "AC Bus: ₹20–₹50, Non-AC: ₹10–₹30, Monthly Pass: ₹500–₹1500 depending on routes."
+  },
+  {
+    keywords: ["timing", "schedule", "time", "route", "arrival", "departure"],
+    reply: "Buses generally run between 6:30 AM – 10:30 PM. You can check exact routes and timings under 'Routes & Timings'."
+  },
+  {
+    keywords: ["lost", "lost item", "missing", "forgot", "lost bag", "lost wallet"],
+    reply: "You can report lost items via the Help Center section under 'Report Lost Item'. Our team will assist you."
+  },
+  {
+    keywords: ["refund", "payment", "failed payment", "duplicate payment", "cancel ticket"],
+    reply: "Refunds are processed within 5–7 working days via Razorpay. For failed or duplicate payments, contact support."
+  },
+  {
+    keywords: ["book", "booking", "ticket booking", "reserve", "reserve seat"],
+    reply: "To book tickets, visit the 'Book Ticket' page, select your route, choose seat, and make payment. E-ticket is generated instantly."
+  },
+  {
+    keywords: ["complaint", "feedback", "issue", "problem", "report"],
+    reply: "You can submit complaints or suggestions under 'Passenger Support > Feedback'. Our team will respond promptly."
+  },
+  {
+    keywords: ["hi", "hello", "hey", "good morning", "good evening"],
+    reply: "Hello! 👋 Ask me about tickets, routes, timings, payments, or complaints."
+  },
+  {
+    keywords: ["route map", "map", "bus route", "stops", "path"],
+    reply: "You can view bus routes and stops under 'Routes & Timings' or use the Smart Planner to find the best route."
+  },
+  {
+    keywords: ["monthly pass", "pass", "subscription", "season pass"],
+    reply: "Monthly passes cost between ₹500–₹1500 depending on the routes. You can purchase them online in the 'Book Ticket' section."
+  },
+  {
+    keywords: ["contact", "support", "help", "phone", "email"],
+    reply: "Contact our support team: 📞 +91-98765-43210 | ✉️ support@smartbus.com (Mon–Sat, 9 AM–6 PM)."
+  },
+  {
+    keywords: ["chatbot", "bot", "assistant"],
+    reply: "You are chatting with the NMMT Assistant! Ask about tickets, routes, timings, payments, lost items, or complaints."
+  },
+  {
+    keywords: ["alternate route", "delay", "traffic", "diversion"],
+    reply: "You can find alternate routes in case of delays or traffic under 'Smart Planner' in Routes & Timings."
+  },
+  {
+    keywords: ["ac", "non-ac", "luxury bus", "comfort"],
+    reply: "We have both AC and Non-AC buses. AC fares range ₹20–₹50, Non-AC ₹10–₹30. Luxury options depend on route."
+  },
+  {
+    keywords: ["nearby stop", "nearest stop", "bus stop"],
+    reply: "You can check nearby bus stops and routes on the 'Track Bus' or 'Routes & Timings' page."
+  },
+  {
+    keywords: ["lost card", "lost qr", "ticket qr", "ticket code"],
+    reply: "If you lost your e-ticket QR code, contact support to retrieve it using your phone number or email."
+  }
+];
+
+  sendBtn.addEventListener('click', () => {
+  const userMsg = chatInput.value.trim().toLowerCase();
+  if(!userMsg) return;
+
+  const userDiv = document.createElement('div');
+  userDiv.className = 'chat-message user';
+  userDiv.textContent = chatInput.value;
+  chatbox.appendChild(userDiv);
+
+  let botReply = "Sorry, I couldn’t understand. Please ask about tickets, routes, timings, or refunds.";
+
+  for (let item of responses) {
+    for (let keyword of item.keywords) {
+      if(userMsg.includes(keyword)) {
+        botReply = item.reply;
+        break;
+      }
+    }
+    if(botReply !== "Sorry, I couldn’t understand. Please ask about tickets, routes, timings, or refunds.") break;
+  }
+
+  const botDiv = document.createElement('div');
+  botDiv.className = 'chat-message bot';
+  botDiv.textContent = botReply;
+  chatbox.appendChild(botDiv);
+
+  chatInput.value = "";
+  chatbox.scrollTop = chatbox.scrollHeight;
+});
+
+
+</script>
+</body>
+</html>

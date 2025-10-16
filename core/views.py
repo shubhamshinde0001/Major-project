@@ -12,10 +12,29 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from .forms import LostAndFoundForm, ComplaintForm, ComplaintImageFormSet
 
+from django.contrib.auth.decorators import login_required
 
+@login_required(login_url='login')
 def home(request):
-    return render(request, 'home.html')
+    """Dashboard after login"""
+    user_profile = None
+    if hasattr(request.user, 'userprofile'):
+        user_profile = request.user.userprofile  # Access extra info like full_name, age, etc.
 
+    context = {
+        'user': request.user,
+        'profile': user_profile
+    }
+    return render(request, 'home.html', context)
+
+def profile(request):
+    return render(request, 'profile.html')
+
+def contact(request):
+    return render(request, 'contact.html')
+
+def services(request):
+    return render(request, 'service.html')
 
 def book_ticket_view(request):
     route_no = request.GET.get('route_no')
@@ -147,6 +166,7 @@ def get_route_stops(request, route_no):
 
 
 from django.http import JsonResponse
+from datetime import datetime
 from .models import RouteStop, Schedule
 
 def available_buses_from_stop(request):
@@ -160,7 +180,9 @@ def available_buses_from_stop(request):
     matching_from_stops = RouteStop.objects.filter(bus_stop__name__iexact=from_stop)
     route_ids = matching_from_stops.values_list('route_id', flat=True)
 
-    schedules = Schedule.objects.filter(route_id__in=route_ids)
+    # Filter out buses that already departed today
+    now = datetime.now().time()
+    schedules = Schedule.objects.filter(route_id__in=route_ids, departure_time__gte=now)
 
     results = []
     for sched in schedules:
@@ -194,6 +216,7 @@ def available_buses_from_stop(request):
 
 
 
+
 import razorpay
 from django.views.decorators.csrf import csrf_exempt
 
@@ -215,71 +238,170 @@ def payment_success(request):
     if request.method == "POST":
         data = json.loads(request.body)
 
-        # Example extracted data from payment response
         route_no = data.get("route_no")
         from_stop = data.get("from")
         to_stop = data.get("to")
         seats = int(data.get("seats") or 1)
-        user = request.user if request.user.is_authenticated else None  # assuming user is logged in
         fare = int(data.get("amount", 0))
-        '''
-        # Get schedule for the given route
-        route = Route.objects.filter(
-    route_no=route_no,
-    source=from_stop,
-    destination=to_stop
-).first()
-    '''
-       # schedule = Schedule.objects.filter(route=route).first()  # or filter by timing too
 
-        # Create booking
+        user = request.user if request.user.is_authenticated else None
+
         booking = Booking.objects.create(
-            #user=user,
-            #schedule=schedule,
+            user=user,  # ✅ Link the booking to the logged-in user
             route=route_no,
             source=from_stop,
             destination=to_stop,
-            seats=int(data.get("seats") or 1),
-            fare= fare,
+            seats=seats,
+            fare=fare,
             created_online=True,
         )
 
-        # ✅ Redirect to confirmation
         return JsonResponse({
-    "message": "Booking confirmed",
-    "redirect_url": reverse('booking_confirmation', kwargs={'booking_id': booking.id})
-})
+            "message": "Booking confirmed",
+            "redirect_url": reverse('booking_confirmation', kwargs={'booking_id': booking.id})
+        })
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
 
+
+from django.http import JsonResponse
+from django.shortcuts import render
+from .models import Booking
+
 def my_bookings(request):
     if not request.user.is_authenticated:
-        # Return dummy bookings or empty for testing
-        bookings = Booking.objects.all().order_by('-booking_time')[:5]  # or []
-    else:
-        bookings = Booking.objects.filter(user=request.user).order_by('-booking_time')
+        return render(request, 'booking_history.html', {'bookings': []})
 
+    bookings = Booking.objects.filter(user=request.user).order_by('-booking_time')
     return render(request, 'booking_history.html', {'bookings': bookings})
 
 
 def get_recent_bookings(request):
     if not request.user.is_authenticated:
-        # Return dummy bookings or empty for testing
-        bookings = Booking.objects.all().order_by('-booking_time')[:3]  # or []
-    else:
-        bookings = Booking.objects.filter(user=request.user).order_by('-booking_time')
+        return JsonResponse({'recent_bookings': []})
 
-    
-    data = []
+    bookings = Booking.objects.filter(user=request.user).order_by('-booking_time')[:3]
 
-    for booking in bookings:
-        route = booking.route
-        data.append({
+    data = [
+        {
             'route_no': booking.route,
             'from_stop': booking.source,
             'to_stop': booking.destination,
-        })
+            'seats': booking.seats,
+            'fare': str(booking.fare),
+            'time': booking.booking_time.strftime('%Y-%m-%d %H:%M:%S'),
+        }
+        for booking in bookings
+    ]
 
     return JsonResponse({'recent_bookings': data})
+
+
+
+
+# views.py
+from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
+from .models import UserProfile
+
+# ---------- SIGNUP ----------
+def signup_view(request):
+    if request.method == 'POST':
+        full_name = request.POST.get('fullname')
+        age_group = request.POST.get('age')
+        gender = request.POST.get('gender')
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        mobile = request.POST.get('mobile')
+
+        if User.objects.filter(username=username).exists():
+            messages.error(request, 'Username already exists.')
+            return redirect('signup')
+
+        # Create user
+        user = User.objects.create_user(username=username, password=password)
+        # Create profile
+        UserProfile.objects.create(
+            user=user,
+            full_name=full_name,
+            age_group=age_group,
+            gender=gender,
+            mobile=mobile
+        )
+
+        messages.success(request, 'Account created successfully! You can now log in.')
+        return redirect('login')
+
+    return render(request, 'signup.html')
+
+
+# ---------- LOGIN ----------
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            messages.success(request, f'Welcome, {user.username}!')
+            return redirect('home')  # Change to your main page
+        else:
+            messages.error(request, 'Invalid username or password.')
+            return redirect('login')
+
+    return render(request, 'login.html')
+
+
+# ---------- LOGOUT ----------
+def logout_view(request):
+    logout(request)
+    messages.success(request, 'You have been logged out.')
+    return redirect('login')
+
+
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from conductor_service.models import BusLocation
+
+@api_view(['GET'])
+def get_bus_location(request, bus_id):
+    try:
+        location = BusLocation.objects.get(bus_id=bus_id)
+        return Response({
+            "latitude": location.latitude,
+            "longitude": location.longitude,
+            "updated_at": location.updated_at
+        })
+    except BusLocation.DoesNotExist:
+        return Response({"error": "Bus location not found"}, status=404)
+
+
+# core/views.py
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+import json
+from .models import Bus, Location
+
+@csrf_exempt
+def update_location(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            bus_id = data.get('bus_id')
+            lat = data.get('latitude')
+            lng = data.get('longitude')
+
+            bus = Bus.objects.get(bus_id=bus_id)
+            Location.objects.create(bus=bus, latitude=lat, longitude=lng)
+            return JsonResponse({"status": "success"})
+        except Exception as e:
+            print("Error updating location:", e)
+            return JsonResponse({"status": "error", "message": str(e)}, status=400)
+    return JsonResponse({"status": "error", "message": "Invalid method"}, status=405)

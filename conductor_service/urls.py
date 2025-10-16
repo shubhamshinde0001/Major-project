@@ -9,4 +9,11 @@ urlpatterns = [
     path('verify-ticket/', views.verify_ticket, name='verify_ticket'),
     path('todays-bookings/', views.todays_bookings, name='todays_bookings'),
 path('booking-analysis/', views.booking_analysis, name='booking_analysis'),
+    path('signup/', views.conductor_signup, name='conductor_signup'),
+    path('login/', views.conductor_login, name='conductor_login'),
+    path('logout/', views.conductor_logout, name='conductor_logout'),
+        path('trip/start/', views.set_trip, name='set_trip'),
+    path('trip/end/', views.end_trip, name='end_trip'),
+    path('api/routes/', views.api_routes, name='api_routes'),
+path('api/stops/', views.api_stops, name='api_stops'),
 ]

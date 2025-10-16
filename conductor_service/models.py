@@ -1,16 +1,19 @@
 from django.db import models
 from django.contrib.auth.models import User
-from core.models import Bus, Schedule, Booking  # Assuming 'core' is your existing app
+from core.models import Bus, Schedule, Booking
 
 class ConductorProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='conductor_profile')
     employee_id = models.CharField(max_length=20, unique=True)
+    contact_number = models.CharField(max_length=15, null=True, blank=True)
+    license_number = models.CharField(max_length=50, null=True, blank=True)
+    profile_picture = models.ImageField(upload_to='conductor_profiles/', null=True, blank=True)
     assigned_bus = models.ForeignKey(Bus, on_delete=models.SET_NULL, null=True, blank=True)
     assigned_schedule = models.ForeignKey(Schedule, on_delete=models.SET_NULL, null=True, blank=True)
-    contact_number = models.CharField(max_length=15, null=True, blank=True)
 
     def __str__(self):
         return f"Conductor {self.user.username} ({self.employee_id})"
+
 
 
 class CashBooking(models.Model):
@@ -42,3 +45,25 @@ class DailyReport(models.Model):
 
     def __str__(self):
         return f"Report: {self.conductor} - {self.date}"
+
+
+class BusLocation(models.Model):
+    bus = models.OneToOneField(Bus, on_delete=models.CASCADE, related_name='current_location')
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.bus} at ({self.latitude}, {self.longitude})"
+    
+
+class ActiveTrip(models.Model):
+    conductor = models.ForeignKey(ConductorProfile, on_delete=models.CASCADE)
+    bus = models.ForeignKey(Bus, on_delete=models.CASCADE)
+    schedule = models.ForeignKey(Schedule, on_delete=models.SET_NULL, null=True, blank=True)
+    started_at = models.DateTimeField(auto_now_add=True)
+    ended_at = models.DateTimeField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"Trip by {self.conductor} on {self.bus}"

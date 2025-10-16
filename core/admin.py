@@ -13,7 +13,7 @@ create_groups()
 
 admin.site.register(Bus)
 admin.site.register(Route)
-admin.site.register(Schedule)
+#admin.site.register(Schedule)
 admin.site.register(Booking)
 admin.site.register(LostAndFound)
 admin.site.register(Location)
@@ -118,3 +118,10 @@ class RouteStopAdmin(admin.ModelAdmin):
 
 class RouteAdmin(admin.ModelAdmin):
     list_display = ['route_no', 'source', 'destination', 'distance']
+
+@admin.register(Schedule)
+class ScheduleAdmin(admin.ModelAdmin):
+    list_display = ('bus', 'route', 'departure_time', 'available_seats')
+    list_filter = ('bus', 'route')
+    search_fields = ('bus__bus_number', 'route__route_no')
+    ordering = ('bus', 'departure_time')

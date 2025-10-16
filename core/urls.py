@@ -1,12 +1,13 @@
 from django.urls import path
-from django.contrib.auth.views import LoginView, LogoutView
+#from django.contrib.auth.views import LoginView, LogoutView
 from . import views
 from core.views import *
 
 urlpatterns = [
     path('', views.home, name='home'),
-    path('login/', LoginView.as_view(template_name='login.html'), name='login'),
-    path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
+    path('login/signup/', views.signup_view, name='signup'),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
     path('book-ticket/', views.book_ticket_view, name='book_ticket'),
     path('booking-confirmation/<int:booking_id>/', views.booking_confirmation, name='booking_confirmation'),
     path('track/<str:bus_id>/', views.track_bus, name='track_bus'),  # Add tracking view
@@ -23,5 +24,9 @@ urlpatterns = [
     path('create-order/', views.create_order, name='create_order'),
     path('payment-success/', views.payment_success, name='payment_success'),
     path('my-bookings/', views.my_bookings, name='my_bookings'),
-    path('api/recent-bookings/', get_recent_bookings, name='recent_bookings'),
+    path('api/recent-bookings/', views.get_recent_bookings, name='recent_bookings'),
+    path('profile/', views.profile, name='profile'),
+    path('services/', views.services, name='services'),
+    path('contact/', views.contact, name='contact'),
+    path('api/update-location/', views.update_location, name='update_location'),
 ]
