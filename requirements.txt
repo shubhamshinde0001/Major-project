@@ -16,5 +16,6 @@ tzdata==2025.2
 urllib3==2.5.0
 django-widget-tweaks
 gunicorn
-
+collectstatic
 djangorestframework
+
