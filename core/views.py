@@ -19,7 +19,7 @@ def home(request):
     """Dashboard after login"""
     user_profile = None
     if hasattr(request.user, 'userprofile'):
-        user_profile = request.user.userprofile  # Access extra info like full_name, age, etc.
+        user_profile = request.user.userprofile  # Access extra info like full_name, age, etc..
 
     context = {
         'user': request.user,
