@@ -36,6 +36,11 @@ def contact(request):
 def services(request):
     return render(request, 'service.html')
 
+
+def team(request):
+    return render(request, 'team.html')
+
+
 def book_ticket_view(request):
     route_no = request.GET.get('route_no')
     from_stop = request.GET.get('from')

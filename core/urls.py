@@ -27,6 +27,8 @@ urlpatterns = [
     path('api/recent-bookings/', views.get_recent_bookings, name='recent_bookings'),
     path('profile/', views.profile, name='profile'),
     path('services/', views.services, name='services'),
+    path('team/', views.team, name='team'),
+
     path('contact/', views.contact, name='contact'),
     path('api/update-location/', views.update_location, name='update_location'),
 ]

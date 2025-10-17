@@ -93,7 +93,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.contrib import messages
 from .models import Bus, Schedule, ActiveTrip
-
+@csrf_exempt
 def conductor_dashboard(request):
     if not request.user.is_authenticated:
         return redirect('conductor_login')
@@ -111,7 +111,7 @@ def conductor_dashboard(request):
         'schedules': schedules,
     }
 
-    return render(request, 'conductor/conductor_dashboard.html', context)
+    return render(request, 'home_dashboard.html', context)
 
 
 # -------------------- TRIP MANAGEMENT --------------------
